@@ -34,6 +34,7 @@ const Company = sequelize.define('Company', {
 const Application = sequelize.define('Application', {
     job_id: { type: DataTypes.INTEGER },
     user_id: { type: DataTypes.INTEGER },
+    resume_file: { type: DataTypes.STRING },
     application_text: { type: DataTypes.TEXT },
     createdAt: { type: DataTypes.DATE, field: 'created_at' }
 }, {

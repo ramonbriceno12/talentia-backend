@@ -5,6 +5,10 @@ const sequelize = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const companyRoutes = require('./routes/companiesRoutes')
+const talentsRoutes = require('./routes/talentsRoutes')
+const skillsRoutes = require('./routes/skillsRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+
 
 dotenv.config();
 const app = express();
@@ -15,6 +19,10 @@ app.use(cors());
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/companies/', companyRoutes);
+app.use('/api/talents/', talentsRoutes);
+app.use('/api/skills', skillsRoutes);
+app.use('/api/upload', uploadRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 
