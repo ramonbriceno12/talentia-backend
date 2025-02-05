@@ -75,7 +75,7 @@ const talentEmailTemplate = (name, email) => `
     <table role="presentation" class="email-container" width="100%" cellspacing="0" cellpadding="0" border="0">
       <tr>
         <td align="center" class="logo-container">
-          <img src="http://talentiave.com/img/logos/LOGO-01.png" alt="Talentia Logo" class="logo">
+          <img src="http://talentiave.com/img/LOGO-01.png" alt="Talentia Logo" class="logo">
         </td>
       </tr>
 
