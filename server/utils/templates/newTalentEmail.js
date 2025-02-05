@@ -75,7 +75,7 @@ const talentEmailTemplate = (name, email) => `
     <table role="presentation" class="email-container" width="100%" cellspacing="0" cellpadding="0" border="0">
       <tr>
         <td align="center" class="logo-container">
-          <img src="http://talentiave.com/assets/img/logos/LOGO-01.png" alt="Talentia Logo" class="logo">
+          <img src="http://talentiave.com/img/logos/LOGO-01.png" alt="Talentia Logo" class="logo">
         </td>
       </tr>
 
@@ -94,7 +94,7 @@ const talentEmailTemplate = (name, email) => `
                 <h3 style="color: #333;">🎯 Checklist de Optimización Profesional</h3>
                 <p style="font-size: 14px; color: #666;">
                   Te dejamos un **checklist en PDF** con los pasos clave para mejorar tu perfil profesional.  
-                  <strong>Si deseas que nosotros lo hagamos por ti, guiándote en cada paso, <a href="http://localhost:3000/actions/calendly-link?email=${email}&name=${name}">agenda una reunión con nosotros</a>.</strong>
+                  <strong>Si deseas que nosotros lo hagamos por ti, guiándote en cada paso, <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}">agenda una reunión con nosotros</a>.</strong>
                   ¡Será un placer conocerte y explorar nuevas oportunidades juntos!
                 </p>
                 
@@ -108,7 +108,7 @@ const talentEmailTemplate = (name, email) => `
                   📥 Descargar Checklist
                 </a>
                 <br>
-                <a href="http://localhost:3000/actions/calendly-link?email=${email}&name=${name}" class="calendly-button" style="color: white !important;">
+                <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}" class="calendly-button" style="color: white !important;">
                   📅 Agendar una reunión
                 </a>
 
