@@ -1,19 +1,22 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const Skill = sequelize.define('Skill', {
+const Skills = sequelize.define(
+  "Skills",
+  {
     name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     category: {
-        type: DataTypes.STRING,
-        allowNull: false
-    }
-}, {
-    tableName: 'skills',
-    timestamps: false
-});
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: "skills",
+    timestamps: false,
+  }
+);
 
-module.exports = Skill;
+module.exports = Skills;

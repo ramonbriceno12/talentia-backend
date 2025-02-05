@@ -2,7 +2,7 @@ const multer = require('multer');
 const { Upload } = require('@aws-sdk/lib-storage');
 const s3 = require('../config/s3');
 
-const bucketName = 'talentia-images';
+const bucketName = 'talentiafilesprod';
 
 const upload = multer({
     storage: multer.memoryStorage(),

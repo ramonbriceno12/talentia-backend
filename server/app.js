@@ -7,7 +7,11 @@ const jobRoutes = require('./routes/jobRoutes');
 const companyRoutes = require('./routes/companiesRoutes')
 const talentsRoutes = require('./routes/talentsRoutes')
 const skillsRoutes = require('./routes/skillsRoutes');
+const jobCategoriesRoutes = require('./routes/jobCategoriesRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const actionsRoutes = require('./routes/actionsRoutes');
+require("./models/associations"); // Ensure associations are set up before syncing
+
 
 
 dotenv.config();
@@ -21,7 +25,9 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/companies/', companyRoutes);
 app.use('/api/talents/', talentsRoutes);
 app.use('/api/skills', skillsRoutes);
+app.use('/api/job-categories', jobCategoriesRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/actions', actionsRoutes);
 
 
 const PORT = process.env.PORT || 5000;

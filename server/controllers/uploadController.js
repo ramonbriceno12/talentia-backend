@@ -1,7 +1,9 @@
 const User = require('../models/userModel');
 const { Application } = require('../models/jobsModel');
+const Company = require('../models/companiesModel');
 const { uploadToS3 } = require('../middleware/upload');
 const e = require('express');
+const { sendCompanyEmail, sendTalentEmail } = require('../utils/sendEmails');
 
 const uploadApplication = async (req, res) => {
     try {
@@ -11,7 +13,7 @@ const uploadApplication = async (req, res) => {
         }
 
         // Upload file to S3 or storage bucket
-        const fileUrl = await uploadToS3(req.file, 'resume');  // Assume this returns a URL
+        const fileUrl = await uploadToS3(req.file, 'application');  // Assume this returns a URL
 
         const existingUser = await User.findOne({ where: { email: req.body.email } });
 
@@ -93,4 +95,92 @@ const uploadResume = async (req, res) => {
     }
 };
 
-module.exports = { uploadAvatar, uploadResume, uploadApplication };
+
+const uploadTalent = async (req, res) => {
+    try {
+        // Check if the file is present
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // Upload file to S3 or storage bucket
+        const fileUrl = await uploadToS3(req.file, 'talentiafilesprod/resumes');  // Assume this returns a URL
+
+        const existingUser = await User.findOne({ where: { email: req.body.email } });
+
+        let user = null;
+
+        if(existingUser){
+            user = existingUser;
+            await User.update(
+                { resume_file: fileUrl },
+                { where: { id: user.id } }
+            );
+        }else{
+            user = await User.create({
+                email: req.body.email,
+                full_name: req.body.name,
+                role: 'talent',
+                resume_file: fileUrl,
+                plan_id: req.body.plan_id,
+            });
+        }
+
+        // Return response with user ID and application ID
+        res.status(200).json({ 
+            message: 'Talent uploaded successfully',
+            user_id: user.id,
+        });
+
+        sendTalentEmail(user.email, 'New Talent Application', user.full_name);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error uploading talent', error });
+    }
+}
+
+const uploadCompany = async (req, res) => {
+    try {
+        // Check if the file is present
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // Upload file to S3 or storage bucket
+        const fileUrl = await uploadToS3(req.file, 'talentiafilesprod/companies');  // Assume this returns a URL
+
+        const existingCompany = await Company.findOne({ where: { email: req.body.email } });
+
+        let company = null;
+
+        if(existingCompany){
+            company = existingCompany;
+            await Company.update(
+                { requirements_file: fileUrl },
+                { where: { id: company.id } }
+            );
+        }else{
+            company = await Company.create({
+                email: req.body.email,
+                name: req.body.name,
+                requirements_file: fileUrl,
+                address: req.body.address,
+            });
+        }
+
+        // Return response with user ID and application ID
+        res.status(200).json({ 
+            message: 'Company uploaded successfully',
+            company_id: company.id,
+        });
+
+        sendCompanyEmail(company.email, 'New Company Application', company.name);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error uploading company', error });
+    }
+}
+
+module.exports = { uploadAvatar, uploadResume, uploadApplication, uploadTalent, uploadCompany };

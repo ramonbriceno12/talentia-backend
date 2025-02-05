@@ -1,4 +1,6 @@
 const User = require('../models/userModel');
+const JobTitle = require('../models/jobTitles');
+const Skills = require('../models/skillsModel');
 const { Op } = require('sequelize');
 
 // Get all talents with optional filtering
@@ -16,19 +18,35 @@ exports.getAllTalents = async (req, res) => {
         }
 
         if (is_featured !== undefined) {
-            whereClause.is_featured = is_featured === 'true';
+            whereClause.is_featured = is_featured === "true";
         }
 
         const talents = await User.findAll({
             where: whereClause,
-            attributes: ['id', 'full_name', 'email', 'bio', 'profile_picture', 'resume_file', 'is_featured', 'createdAt'],
-            order: [['createdAt', 'DESC']]
+            attributes: [
+                "id", "full_name", "email", "bio", "profile_picture", "resume_file", 
+                "is_featured", "createdAt", "updatedAt"
+            ],
+            include: [
+                {
+                    model: JobTitle,
+                    attributes: ["title"], // Only get the job title name
+                    as: "job_title" // Alias the association
+                },
+                {
+                    model: Skills, // Include the Skills model
+                    attributes: ["id", "name", "category"], // Select specific fields
+                    as: "skills", // Alias for the association
+                    through: { attributes: [] } // Exclude the join table (user_skills) fields
+                }
+            ],
+            order: [["createdAt", "DESC"]]
         });
 
         res.json(talents);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Error fetching talents' });
+        res.status(500).json({ message: "Error fetching talents" });
     }
 };
 
@@ -50,7 +68,7 @@ exports.getTalentById = async (req, res) => {
 
 // Create a new talent
 exports.createTalent = async (req, res) => {
-    const { email, password_hash, full_name, bio, profile_picture, resume_file, is_featured } = req.body;
+    const { email, password_hash, full_name, bio, profile_picture, resume_file, is_featured, plan_id } = req.body;
 
     try {
         const existingUser = await User.findOne({ where: { email } });
@@ -66,7 +84,9 @@ exports.createTalent = async (req, res) => {
             bio,
             profile_picture,
             resume_file,
-            is_featured
+            is_featured,
+            role: 'talent',
+            plan_id
         });
 
         res.status(201).json({ message: 'Talent created successfully', talent: newTalent });
