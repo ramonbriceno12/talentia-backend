@@ -57,7 +57,7 @@ const addSubscription = async (req, res) => {
             await user.save();
         }
 
-        sendSubscriptionEmail(email, 'Talentia - PDF Gratis para mejorar tu perfil profesional 📥', full_name);
+        sendSubscriptionEmail(email, 'Talentia - PDF Gratis para mejorar tu perfil profesional 📥', name);
 
         res.status(200).json({ message: "Subscription added successfully", email: user.email });
 
