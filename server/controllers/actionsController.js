@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Company = require("../models/companiesModel");
+const { sendSubscriptionEmail } = require("../utils/sendEmails");
 
 const calendlyClickedByUser = async (req, res) => {
     try {
@@ -38,4 +39,33 @@ const calendlyClickedByCompany = async (req, res) => {
     }
 }
 
-module.exports = { calendlyClickedByUser, calendlyClickedByCompany };
+const addSubscription = async (req, res) => {
+    
+    try {
+        const {name, email} = req.body;
+        const user = await User.findOne({ where: { email } });
+
+        if(!user){
+            await User.create({
+                full_name: name,
+                email,
+                role: 'talent',
+                subscribed: true,
+            });
+        }else{
+            user.subscribed = true;
+            await user.save();
+        }
+
+        sendSubscriptionEmail(user.email, 'Talentia - PDF Gratis para mejorar tu perfil profesional 📥', user.full_name);
+
+        res.status(200).json({ message: "Subscription added successfully", email: user.email });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error adding subscription" });
+    }
+
+}
+
+module.exports = { calendlyClickedByUser, calendlyClickedByCompany, addSubscription };

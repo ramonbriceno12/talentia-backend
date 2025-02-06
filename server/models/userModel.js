@@ -31,6 +31,7 @@ const User = sequelize.define(
     updatedAt: { type: DataTypes.DATE, field: "updated_at" },
     calendly_clicked: { type: DataTypes.BOOLEAN, defaultValue: false },
     plan_id: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 1 },
+    subscribed: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   {
     tableName: "users",
