@@ -16,7 +16,7 @@ const sendTalentEmail = async (to, subject, name) => {
 
     const mailOptions = {
       from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
-      to: [to, "ramonbriceno12@gmail.com"],
+      to: [to, "contacto@talentiave.com"],
       subject,
       html: talentEmailTemplate(name, to),
     };
@@ -40,7 +40,7 @@ const sendCompanyEmail = async (to, subject, name) => {
 
     const mailOptions = {
       from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
-      to: [to, "ramonbriceno12@gmail.com"],
+      to: [to, "contacto@talentiave.com"],
       subject,
       html: companyEmailTemplate(name, to),
     };
@@ -64,7 +64,7 @@ const sendSubscriptionEmail = async (to, subject, name) => {
 
     const mailOptions = {
       from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
-      to: [to, "ramonbriceno12@gmail.com"],
+      to: [to, "contacto@talentiave.com"],
       subject,
       html: newSubscriptionEmailTemplate(name, to),
     };
