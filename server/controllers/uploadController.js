@@ -132,7 +132,7 @@ const uploadTalent = async (req, res) => {
             user_id: user.id,
         });
 
-        sendTalentEmail(user.email, 'New Talent Application', user.full_name);
+        sendTalentEmail(user.email, '¡Tu registro en Talentia está completo! 🚀', user.full_name);
 
     } catch (error) {
         console.log(error)
@@ -175,7 +175,7 @@ const uploadCompany = async (req, res) => {
             company_id: company.id,
         });
 
-        sendCompanyEmail(company.email, 'New Company Application', company.name);
+        sendCompanyEmail(company.email, '¡Tu solicitud como empresa ha sido recibida en Talentia!', company.name);
 
     } catch (error) {
         console.log(error)
