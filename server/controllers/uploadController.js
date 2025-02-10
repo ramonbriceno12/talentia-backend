@@ -2,6 +2,8 @@ const User = require('../models/userModel');
 const { Application } = require('../models/jobsModel');
 const Company = require('../models/companiesModel');
 const JobTitle = require('../models/jobTitles');
+const Skills = require('../models/skillsModel');
+const UserSkills = require('../models/userSkills');
 const { uploadToS3 } = require('../middleware/upload');
 const e = require('express');
 const { sendCompanyEmail, sendTalentEmail } = require('../utils/sendEmails');
@@ -133,6 +135,20 @@ const uploadTalent = async (req, res) => {
                 plan_id: req.body.plan_id,
                 job_title_id: jobTitle.id,
             });
+        }
+
+        // 🔹 Fix: Handle Skills Correctly
+        if (req.body.skills && typeof req.body.skills === "string") {
+            const skills = req.body.skills.split(",").map(skill => skill.trim()); // Ensure it's properly split
+            for (const skill of skills) {
+                const existingSkill = await Skills.findOne({ where: { name: skill } });
+                if (existingSkill) {
+                    await UserSkills.create({
+                        user_id: user.id,
+                        skill_id: existingSkill.id,
+                    });
+                }
+            }
         }
 
         // Return response with user ID
