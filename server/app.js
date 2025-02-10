@@ -7,9 +7,9 @@ const jobRoutes = require('./routes/jobRoutes');
 const companyRoutes = require('./routes/companiesRoutes')
 const talentsRoutes = require('./routes/talentsRoutes')
 const skillsRoutes = require('./routes/skillsRoutes');
-const jobCategoriesRoutes = require('./routes/jobCategoriesRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const actionsRoutes = require('./routes/actionsRoutes');
+const jobTitlesRoutes = require('./routes/jobTitlesRoutes');
 require("./models/associations"); // Ensure associations are set up before syncing
 
 
@@ -18,22 +18,22 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-  origin: 'https://talentiave.com', // Only allow your frontend
-  methods: 'GET,POST,PUT,DELETE',
-  allowedHeaders: 'Content-Type,Authorization',
-  credentials: true
-}));
+// app.use(cors({
+//   origin: 'https://talentiave.com', // Only allow your frontend
+//   methods: 'GET,POST,PUT,DELETE',
+//   allowedHeaders: 'Content-Type,Authorization',
+//   credentials: true
+// }));
+app.use(cors());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/companies/', companyRoutes);
 app.use('/api/talents/', talentsRoutes);
 app.use('/api/skills', skillsRoutes);
-app.use('/api/job-categories', jobCategoriesRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/actions', actionsRoutes);
-
+app.use('/api/job-titles', jobTitlesRoutes);
 
 const PORT = process.env.PORT || 5000;
 

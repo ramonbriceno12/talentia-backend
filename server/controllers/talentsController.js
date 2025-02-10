@@ -13,13 +13,11 @@ exports.getAllTalents = async (req, res) => {
         if (search) {
             whereClause[Op.or] = [
                 { full_name: { [Op.iLike]: `%${search}%` } },
-                { bio: { [Op.iLike]: `%${search}%` } }
+                { bio: { [Op.iLike]: `%${search}%` } },
             ];
         }
 
-        if (is_featured !== undefined) {
-            whereClause.is_featured = is_featured === "true";
-        }
+        whereClause.is_featured = "true";
 
         const talents = await User.findAll({
             where: whereClause,

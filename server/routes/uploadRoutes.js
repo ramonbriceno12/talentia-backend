@@ -13,7 +13,7 @@ router.post('/resume', upload.single('resume'), uploadResume);
 router.post('/application', upload.single('resume'), uploadApplication);
 
 //Upload talent
-router.post('/talent', upload.single('resume'), uploadTalent);
+router.post('/talent', upload.fields([{ name: "resume" }, { name: "avatar" }]), uploadTalent);
 
 //Upload company
 router.post('/company', upload.single('jobRequirements'), uploadCompany);

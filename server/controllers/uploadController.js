@@ -98,47 +98,53 @@ const uploadResume = async (req, res) => {
 
 const uploadTalent = async (req, res) => {
     try {
-        // Check if the file is present
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
+        // Ensure files are uploaded
+        if (!req.files || (!req.files.resume && !req.files.avatar)) {
+            return res.status(400).json({ message: "No files uploaded" });
         }
 
-        // Upload file to S3 or storage bucket
-        const fileUrl = await uploadToS3(req.file, 'talentiafilesprod/resumes');  // Assume this returns a URL
+        // Upload files to S3
+        let resumeUrl = req.files.resume ? await uploadToS3(req.files.resume[0], "talentiafilesprod/resumes") : null;
+        let avatarUrl = req.files.avatar ? await uploadToS3(req.files.avatar[0], "talentiafilesprod/avatars") : null;
 
         const existingUser = await User.findOne({ where: { email: req.body.email } });
 
         let user = null;
 
-        if(existingUser){
+        if (existingUser) {
             user = existingUser;
+            console.log(avatarUrl, resumeUrl);
             await User.update(
-                { resume_file: fileUrl },
+                {
+                    resume_file: resumeUrl || user.resume_file, // Only update if new file is uploaded
+                    profile_picture: avatarUrl || user.profile_picture,
+                },
                 { where: { id: user.id } }
             );
-        }else{
+        } else {
             user = await User.create({
                 email: req.body.email,
                 full_name: req.body.name,
-                role: 'talent',
-                resume_file: fileUrl,
+                role: "talent",
+                resume_file: resumeUrl,
+                profile_picture: avatarUrl,
                 plan_id: req.body.plan_id,
             });
         }
 
-        // Return response with user ID and application ID
-        res.status(200).json({ 
-            message: 'Talent uploaded successfully',
+        // Return response with user ID
+        res.status(200).json({
+            message: "Talent uploaded successfully",
             user_id: user.id,
         });
 
-        sendTalentEmail(user.email, '¡Tu registro en Talentia está completo! 🚀', user.full_name);
-
+        sendTalentEmail(user.email, "¡Tu registro en Talentia está completo! 🚀", user.full_name);
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: 'Error uploading talent', error });
+        console.error(error);
+        res.status(500).json({ message: "Error uploading talent", error });
     }
-}
+};
+
 
 const uploadCompany = async (req, res) => {
     try {
