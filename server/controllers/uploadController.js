@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const { Application } = require('../models/jobsModel');
 const Company = require('../models/companiesModel');
+const JobTitle = require('../models/jobTitles');
 const { uploadToS3 } = require('../middleware/upload');
 const e = require('express');
 const { sendCompanyEmail, sendTalentEmail } = require('../utils/sendEmails');
@@ -108,16 +109,17 @@ const uploadTalent = async (req, res) => {
         let avatarUrl = req.files.avatar ? await uploadToS3(req.files.avatar[0], "talentiafilesprod/avatars") : null;
 
         const existingUser = await User.findOne({ where: { email: req.body.email } });
+        const jobTitle = await JobTitle.findOne({ where: { title: req.body.job_title } });
 
         let user = null;
 
         if (existingUser) {
             user = existingUser;
-            console.log(avatarUrl, resumeUrl);
             await User.update(
                 {
                     resume_file: resumeUrl || user.resume_file, // Only update if new file is uploaded
                     profile_picture: avatarUrl || user.profile_picture,
+                    job_title_id: jobTitle.id,
                 },
                 { where: { id: user.id } }
             );
@@ -129,6 +131,7 @@ const uploadTalent = async (req, res) => {
                 resume_file: resumeUrl,
                 profile_picture: avatarUrl,
                 plan_id: req.body.plan_id,
+                job_title_id: jobTitle.id,
             });
         }
 
