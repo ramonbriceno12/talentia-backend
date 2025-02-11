@@ -15,7 +15,7 @@ const router = express.Router();
 router.get('/', getAllTalents);
 
 // Get talent by ID
-router.get('/:id', authenticateJWT, getTalentById);
+router.get('/:id', getTalentById);
 
 // Create a new talent
 router.post('/', authenticateJWT, createTalent);

@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const JobTitle = require('../models/jobTitles');
 const Skills = require('../models/skillsModel');
 const { Op } = require('sequelize');
+const UserSkills = require("../models/userSkills");
 
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
@@ -51,18 +52,51 @@ exports.getAllTalents = async (req, res) => {
 // Get talent by ID
 exports.getTalentById = async (req, res) => {
     try {
+        // Fetch user with job title
         const talent = await User.findByPk(req.params.id, {
-            attributes: ['id', 'full_name', 'email', 'bio', 'profile_picture', 'resume_file', 'is_featured', 'createdAt']
+            attributes: [
+                "id", "full_name", "email", "bio", "profile_picture",
+                "resume_file", "is_featured", "createdAt"
+            ],
+            include: [
+                {
+                    model: JobTitle,
+                    as: "job_title",
+                    attributes: ["title"]
+                }
+            ]
         });
 
-        if (!talent) return res.status(404).json({ message: 'Talent not found' });
+        if (!talent) return res.status(404).json({ message: "Talent not found" });
 
-        res.json(talent);
+        // Fetch skills from UserSkills table
+        const userSkills = await UserSkills.findAll({
+            where: { user_id: talent.id }, // Match user_id
+            attributes: ["skill_id"]
+        });
+
+        // Extract skill IDs
+        const skillIds = userSkills.map(us => us.skill_id);
+
+        // Fetch skills based on extracted IDs
+        const skills = await Skills.findAll({
+            where: { id: skillIds },
+            attributes: ["id", "name", "category"]
+        });
+
+        // Attach skills to talent object
+        res.json({
+            ...talent.toJSON(),
+            skills // Append skills manually
+        });
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error fetching talent' });
+        console.error(error);
+        res.status(500).json({ message: "Error fetching talent" });
     }
 };
+
+
 
 // Create a new talent
 exports.createTalent = async (req, res) => {

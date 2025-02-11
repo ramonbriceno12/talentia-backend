@@ -4,6 +4,7 @@ const Company = require('../models/companiesModel');
 const JobTitle = require('../models/jobTitles');
 const Skills = require('../models/skillsModel');
 const UserSkills = require('../models/userSkills');
+const Proposal = require('../models/proposalsModel');
 const { uploadToS3 } = require('../middleware/upload');
 const e = require('express');
 const { sendCompanyEmail, sendTalentEmail } = require('../utils/sendEmails');
@@ -22,9 +23,9 @@ const uploadApplication = async (req, res) => {
 
         let userId = null;
 
-        if(existingUser){
+        if (existingUser) {
             userId = existingUser.id;
-        }else{
+        } else {
             const user = await User.create({
                 email: req.body.email,
                 full_name: req.body.name,
@@ -42,7 +43,7 @@ const uploadApplication = async (req, res) => {
         });
 
         // Return response with user ID and application ID
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Application uploaded successfully',
             user_id: user.id,
             application_id: application.id,
@@ -179,13 +180,13 @@ const uploadCompany = async (req, res) => {
 
         let company = null;
 
-        if(existingCompany){
+        if (existingCompany) {
             company = existingCompany;
             await Company.update(
                 { requirements_file: fileUrl },
                 { where: { id: company.id } }
             );
-        }else{
+        } else {
             company = await Company.create({
                 email: req.body.email,
                 name: req.body.name,
@@ -195,7 +196,7 @@ const uploadCompany = async (req, res) => {
         }
 
         // Return response with user ID and application ID
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Company uploaded successfully',
             company_id: company.id,
         });
@@ -208,4 +209,51 @@ const uploadCompany = async (req, res) => {
     }
 }
 
-module.exports = { uploadAvatar, uploadResume, uploadApplication, uploadTalent, uploadCompany };
+const uploadProposal = async (req, res) => {
+    try {
+        const { name, email, userType, description, talentId } = req.body;
+
+        if (!name || !email || !userType || !description || !talentId) {
+            return res.status(400).json({ message: "Todos los campos son obligatorios" });
+        }
+
+        // 🔹 1️⃣ Buscar si el usuario que envía la propuesta ya existe
+        let proposalUser = await User.findOne({ where: { email } });
+
+        if (!proposalUser) {
+            // 🔹 2️⃣ Si el usuario no existe, crearlo
+            proposalUser = await User.create({
+                full_name: name,
+                email,
+                role: userType, // Puede ser 'talent', 'recruiter', 'company'
+                profile_picture: null, // Opcional
+                resume_file: null, // Opcional
+                job_title_id: null // No definido para nuevos usuarios
+            });
+        }
+
+        // 🔹 3️⃣ Buscar si el talento existe
+        const talent = await User.findByPk(talentId);
+        if (!talent) {
+            return res.status(404).json({ message: "El talento no existe" });
+        }
+
+        // 🔹 4️⃣ Crear la propuesta en la base de datos
+        const newProposal = await Proposal.create({
+            talent_id: talent.id,
+            proposal_user_id: proposalUser.id,
+            description
+        });
+
+        // 🔹 5️⃣ Enviar correo de confirmación (puedes usar nodemailer o algún otro servicio)
+        // sendCompanyEmail(email, "¡Tu propuesta ha sido recibida en Talentia!", name);
+
+        res.status(201).json({ message: "Propuesta enviada exitosamente", proposal: newProposal });
+
+    } catch (error) {
+        console.error("Error al subir la propuesta:", error);
+        res.status(500).json({ message: "Error al subir la propuesta", error });
+    }
+};
+
+module.exports = { uploadAvatar, uploadResume, uploadApplication, uploadTalent, uploadCompany, uploadProposal };
