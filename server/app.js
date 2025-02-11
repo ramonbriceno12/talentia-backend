@@ -10,6 +10,7 @@ const skillsRoutes = require('./routes/skillsRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const actionsRoutes = require('./routes/actionsRoutes');
 const jobTitlesRoutes = require('./routes/jobTitlesRoutes');
+const linksRoutes = require('./routes/linksRoutes');
 require("./models/associations"); // Ensure associations are set up before syncing
 
 
@@ -34,6 +35,7 @@ app.use('/api/skills', skillsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/actions', actionsRoutes);
 app.use('/api/job-titles', jobTitlesRoutes);
+app.use('/api/links/', linksRoutes);
 
 const PORT = process.env.PORT || 5000;
 
