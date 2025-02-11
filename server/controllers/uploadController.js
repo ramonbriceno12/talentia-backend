@@ -7,7 +7,7 @@ const UserSkills = require('../models/userSkills');
 const Proposal = require('../models/proposalsModel');
 const { uploadToS3 } = require('../middleware/upload');
 const e = require('express');
-const { sendCompanyEmail, sendTalentEmail } = require('../utils/sendEmails');
+const { sendCompanyEmail, sendTalentEmail, sendProposalUserEmail, sendProposalAdminEmail, sendTalentProposalEmail } = require('../utils/sendEmails');
 
 const uploadApplication = async (req, res) => {
     try {
@@ -245,8 +245,11 @@ const uploadProposal = async (req, res) => {
             description
         });
 
-        // 🔹 5️⃣ Enviar correo de confirmación (puedes usar nodemailer o algún otro servicio)
-        // sendCompanyEmail(email, "¡Tu propuesta ha sido recibida en Talentia!", name);
+        // 🔹 5️⃣ Enviar correos electrónicos
+
+        await sendProposalUserEmail(email, "📩 Propuesta Enviada con Éxito", proposalUser.full_name);
+        await sendProposalAdminEmail("🚀 Nueva Propuesta Recibida", talent.email, proposalUser.email, talent.resume_file, description );
+        await sendTalentProposalEmail(talent.email, "🎯 Interés en tu Perfil en Talentia", talent.full_name);
 
         res.status(201).json({ message: "Propuesta enviada exitosamente", proposal: newProposal });
 

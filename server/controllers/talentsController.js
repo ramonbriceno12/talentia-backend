@@ -1,14 +1,14 @@
 const User = require('../models/userModel');
 const JobTitle = require('../models/jobTitles');
 const Skills = require('../models/skillsModel');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const UserSkills = require("../models/userSkills");
 
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
     try {
         const { search, is_featured } = req.query;
-        
+
         const whereClause = {};
 
         if (search) {
@@ -18,28 +18,36 @@ exports.getAllTalents = async (req, res) => {
             ];
         }
 
-        whereClause.is_featured = "true";
+        whereClause.is_featured = true;
 
         const talents = await User.findAll({
             where: whereClause,
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture", "resume_file", 
-                "is_featured", "createdAt", "updatedAt"
+                "is_featured", "createdAt", "updatedAt",
+                [
+                    Sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM user_skills
+                        WHERE user_skills.user_id = "User".id
+                    )`),
+                    "skill_count"
+                ] // Subquery to count skills
             ],
             include: [
                 {
                     model: JobTitle,
-                    attributes: ["title"], // Only get the job title name
-                    as: "job_title" // Alias the association
+                    attributes: ["title"],
+                    as: "job_title"
                 },
                 {
-                    model: Skills, // Include the Skills model
-                    attributes: ["id", "name", "category"], // Select specific fields
-                    as: "skills", // Alias for the association
-                    through: { attributes: [] } // Exclude the join table (user_skills) fields
+                    model: Skills,
+                    attributes: ["id", "name", "category"],
+                    as: "skills",
+                    through: { attributes: [] }
                 }
             ],
-            order: [["createdAt", "DESC"]]
+            order: [[Sequelize.literal("skill_count"), "DESC"], ["createdAt", "DESC"]] // Sort by skill count, then by latest created
         });
 
         res.json(talents);
