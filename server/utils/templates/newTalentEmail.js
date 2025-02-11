@@ -92,10 +92,14 @@ const talentEmailTemplate = (name, email) => `
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
                 <h3 style="color: #333;">🎯 Checklist de Optimización Profesional</h3>
-                <p style="font-size: 14px; color: #666;">
+                <p style="font-size: 21px; color: #666;">
                   Te dejamos un **checklist en PDF** con los pasos clave para mejorar tu perfil profesional.  
                   <strong>Si deseas que nosotros lo hagamos por ti, guiándote en cada paso, <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}">agenda una reunión con nosotros</a>.</strong>
                   ¡Será un placer conocerte y explorar nuevas oportunidades juntos!
+                </p>
+                <p style="font-size: 21px; color: #333;">
+                  Actualmente, tu perfil está en proceso de revisión. En un plazo de **2-3 días**, optimizaremos tu bio y estarás publicado en la sección de talentos de **Talentia**.  
+                  Puedes ver la sección aquí: <a href="https://talentiave.com/talents" style="color: #006bff; text-decoration: none;">Talentos Talentia</a>.  
                 </p>
                 
                 <p style="font-size: 14px; color: #666;">
