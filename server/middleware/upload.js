@@ -6,7 +6,7 @@ const bucketName = 'talentiafilesprod';
 
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 80 * 1024 * 1024 }, // 5 MB limit
+    limits: { fileSize: 80 * 1024 * 1024 }, // 80 MB limit
 });
 
 const uploadToS3 = async (file, folder) => {
