@@ -80,18 +80,12 @@ const sendImprovementEmail = async (req, res) => {
         // Send an improvement email to each user
         for (const user of users) {
             console.log('Sending email to:', user.email);
-            if(user.email === 'ramonbriceno12@gmail.com' || user.email === 'ramonbricenopaypal@gmail.com' || user.email === 'ramonbricenoaws@gmail.com'){
-                await sendImproveProfileEmail(
-                    user.email,
-                    '⚠️ Tu perfil puede estar limitando tus oportunidades… Descubre cómo mejorar 📥',
-                    user.full_name
-                );
-            }
-            // await sendImproveProfileEmail(
-            //     user.email,
-            //     '⚠️ Tu perfil puede estar limitando tus oportunidades… Descubre cómo mejorar 📥',
-            //     user.full_name
-            // );
+            
+            await sendImproveProfileEmail(
+                user.email,
+                '⚠️ Tu perfil puede estar limitando tus oportunidades… Descubre cómo mejorar 📥',
+                user.full_name
+            );
         }
 
         res.status(200).json({ message: "Emails sent successfully to all users" });
