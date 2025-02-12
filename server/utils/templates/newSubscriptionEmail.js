@@ -60,16 +60,30 @@ const newSubscriptionEmail = (name, email) => `
         margin-top: 20px;
       }
 
-      .calendly-button img {
-        width: 20px;
-        height: 20px;
-        margin-right: 10px;
-      }
-
       .footer {
         font-size: 12px;
         color: #666;
         margin-top: 20px;
+      }
+
+      .price-box {
+        background: #fff9c4;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .old-price {
+        text-decoration: line-through;
+        color: #d9534f;
+        font-size: 20px;
+      }
+
+      .new-price {
+        color: #28a745;
+        font-size: 24px;
       }
     </style>
   </head>
@@ -108,27 +122,36 @@ const newSubscriptionEmail = (name, email) => `
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
-                <h3 style="color: #333;">💡 ¿Necesitas ayuda para implementarlo?</h3>
                 <p style="font-size: 14px; color: #666;">
-                  Sabemos que aplicar todos estos cambios puede ser abrumador. Si quieres ayuda personalizada para optimizar tu CV y mejorar tu presencia profesional,  
-                  **te invitamos a una sesión 1-1 gratuita** con nuestro equipo.
+                  **Mientras tanto, ¿Necesitas ayuda para aplicar estas instrucciones y mejorar tu perfil?** 🚀 Revisa nuestras opciones profesionales:
                 </p>
 
-                <p style="font-size: 14px; color: #666;">
-                  Haz clic en el siguiente botón para elegir un horario disponible:
-                </p>
+                <h3>🚀 Mejora tu Perfil Profesional con Nuestros Planes</h3>
 
-                <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}" class="calendly-button" style="color: white !important;">
-                  📅 Agendar una reunión
-                </a>
+                <div class="price-box">
+                  ✅ <strong>Actualización de CV</strong>  
+                  <br>✏️ <span class="old-price">$30</span> → <span class="new-price">$15</span>  
+                  <br>🔹 Optimización de contenido y formato profesional.
+                  <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+                </div>
 
-                <p style="font-size: 14px; color: #666; margin-top: 10px;">
-                  **📌 <strong>Descripción de la reunión:</strong>** En esta sesión gratuita de 20-30 minutos, analizaremos tu perfil y te brindaremos sugerencias para mejorar tu CV, optimizar tu LinkedIn y aumentar tus oportunidades laborales.
-                </p>
+                <div class="price-box">
+                  ✅ <strong>CV + LinkedIn + Portafolio</strong>  
+                  <br>💼 <span class="old-price">$50</span> → <span class="new-price">$30</span>  
+                  <br>🔹 Mejora tu presencia profesional en todas las plataformas clave.
+                  <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+                </div>
+
+                <div class="price-box">
+                  ✅ <strong>Creación Completa (CV + LinkedIn + Portafolio Online)</strong>  
+                  <br>🌐 <span class="old-price">$100</span> → <span class="new-price">$50</span>  
+                  <br>🔹 Creamos todo desde cero con un portafolio web personalizado.
+                  <br>🔹 <strong>¡Además, te ayudamos con tu búsqueda de empleo!</strong>  
+                  <br>📌 Te guiamos en cada paso para aplicar a oportunidades que se ajusten a tu perfil.
+                  <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+                </div>
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
-
-                <a href="https://talentiave.com" class="button" style="color: white !important;">Visitar Talentia</a>
 
                 <p class="footer">
                   © ${new Date().getFullYear()} Talentia. Todos los derechos reservados.
