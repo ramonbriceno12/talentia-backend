@@ -32,6 +32,7 @@ const User = sequelize.define(
     calendly_clicked: { type: DataTypes.BOOLEAN, defaultValue: false },
     plan_id: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 1 },
     subscribed: { type: DataTypes.BOOLEAN, defaultValue: false },
+    email_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   {
     tableName: "users",
