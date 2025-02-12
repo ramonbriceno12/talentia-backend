@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const Company = require("../models/companiesModel");
-const { sendSubscriptionEmail } = require("../utils/sendEmails");
+const { sendSubscriptionEmail, sendImproveProfileEmail } = require("../utils/sendEmails");
 
 const calendlyClickedByUser = async (req, res) => {
     try {
@@ -68,4 +68,39 @@ const addSubscription = async (req, res) => {
 
 }
 
-module.exports = { calendlyClickedByUser, calendlyClickedByCompany, addSubscription };
+const sendImprovementEmail = async (req, res) => {
+    try {
+        // Fetch all users from the database
+        const users = await User.findAll({ attributes: ['full_name', 'email'] });
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: "No users found" });
+        }
+
+        // Send an improvement email to each user
+        for (const user of users) {
+            console.log('Sending email to:', user.email);
+            if(user.email === 'ramonbriceno12@gmail.com' || user.email === 'ramonbricenopaypal@gmail.com' || user.email === 'ramonbricenoaws@gmail.com'){
+                await sendImproveProfileEmail(
+                    user.email,
+                    '⚠️ Tu perfil puede estar limitando tus oportunidades… Descubre cómo mejorar 📥',
+                    user.full_name
+                );
+            }
+            // await sendImproveProfileEmail(
+            //     user.email,
+            //     '⚠️ Tu perfil puede estar limitando tus oportunidades… Descubre cómo mejorar 📥',
+            //     user.full_name
+            // );
+        }
+
+        res.status(200).json({ message: "Emails sent successfully to all users" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error sending emails" });
+    }
+};
+
+
+module.exports = { calendlyClickedByUser, calendlyClickedByCompany, addSubscription, sendImprovementEmail };

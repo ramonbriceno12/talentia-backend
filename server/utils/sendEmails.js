@@ -5,6 +5,7 @@ const newSubscriptionEmailTemplate = require("./templates/newSubscriptionEmail")
 const proposalUserEmailTemplate = require("./templates/proposals/proposalUserEmailTemplate");
 const adminEmailTemplate = require("./templates/proposals/adminEmailTemplate");
 const talentProposalEmailTemplate = require("./templates/proposals/talentEmailTemplate");
+const resumeImprovementEmailTemplate = require("./templates/bulk-emails/optimizeProfileEmail");
 require("dotenv").config();
 
 const sendTalentEmail = async (to, subject, name) => {
@@ -151,4 +152,28 @@ const sendTalentProposalEmail = async (to, subject, name) => {
   }
 };
 
-module.exports = { sendTalentEmail, sendCompanyEmail, sendSubscriptionEmail, sendProposalUserEmail, sendProposalAdminEmail, sendTalentProposalEmail };
+const sendImproveProfileEmail = async (to, subject, name) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail", // or use 'SMTP' for custom email providers
+      auth: {
+        user: process.env.EMAIL_USERNAME, // Your email
+        pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+      },
+    });
+
+    const mailOptions = {
+      from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
+      to,
+      subject,
+      html: resumeImprovementEmailTemplate(name),
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully to", to);
+  } catch (error) {
+    console.error("❌ Error sending email:", error);
+  }
+};
+
+module.exports = { sendTalentEmail, sendCompanyEmail, sendSubscriptionEmail, sendProposalUserEmail, sendProposalAdminEmail, sendTalentProposalEmail, sendImproveProfileEmail };
