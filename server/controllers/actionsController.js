@@ -70,17 +70,15 @@ const addSubscription = async (req, res) => {
 
 const sendImprovementEmail = async (req, res) => {
     try {
-        // Fetch all users from the database
+        // Fetch users with email_sent = false and include the primary key
         const users = await User.findAll({
-            attributes: ['full_name', 'email'],
+            attributes: ['id', 'full_name', 'email'],  // Include the primary key
             where: { email_sent: false }
         });
-
 
         if (!users || users.length === 0) {
             return res.status(404).json({ message: "No users found" });
         }
-
 
         // Send an improvement email to each user
         for (const user of users) {
@@ -92,8 +90,11 @@ const sendImprovementEmail = async (req, res) => {
                 user.full_name
             );
 
-            user.email_sent = true;
-            await user.save();
+            // Update email_sent status using update() instead of save()
+            await User.update(
+                { email_sent: true },
+                { where: { id: user.id } }
+            );
         }
 
         res.status(200).json({ message: "Emails sent successfully to all users" });
@@ -103,6 +104,7 @@ const sendImprovementEmail = async (req, res) => {
         res.status(500).json({ message: "Error sending emails" });
     }
 };
+
 
 
 module.exports = { calendlyClickedByUser, calendlyClickedByCompany, addSubscription, sendImprovementEmail };
