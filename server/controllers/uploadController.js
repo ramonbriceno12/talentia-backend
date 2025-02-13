@@ -168,14 +168,24 @@ const uploadTalent = async (req, res) => {
 
 const uploadCompany = async (req, res) => {
     try {
-        // Check if the file is present
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
+        let fileUrl = null;
+
+        // Check if a file was uploaded
+        if (req.file) {
+            fileUrl = await uploadToS3(req.file, 'talentiafilesprod/companies');  // Assume this returns a URL
         }
 
-        // Upload file to S3 or storage bucket
-        const fileUrl = await uploadToS3(req.file, 'talentiafilesprod/companies');  // Assume this returns a URL
+        // If no file, check if a jobRequirementsLink is provided
+        if(req.body.jobRequirementsLink) {
+            fileUrl = req.body.jobRequirementsLink;
+        }
 
+        // Ensure at least one of file or link is provided
+        if (!fileUrl && !jobRequirementsLink) {
+            return res.status(400).json({ message: 'Debe proporcionar un archivo o un enlace de requerimientos' });
+        }
+
+        // Check if the company already exists
         const existingCompany = await Company.findOne({ where: { email: req.body.email } });
 
         let company = null;
@@ -183,7 +193,11 @@ const uploadCompany = async (req, res) => {
         if (existingCompany) {
             company = existingCompany;
             await Company.update(
-                { requirements_file: fileUrl },
+                { 
+                    requirements_file: fileUrl,
+                    name: req.body.name,
+                    address: req.body.address, 
+                },
                 { where: { id: company.id } }
             );
         } else {
@@ -195,19 +209,20 @@ const uploadCompany = async (req, res) => {
             });
         }
 
-        // Return response with user ID and application ID
+        // Return response with company ID
         res.status(200).json({
-            message: 'Company uploaded successfully',
+            message: 'Empresa registrada exitosamente',
             company_id: company.id,
         });
 
-        sendCompanyEmail(company.email, '¡Tu solicitud como empresa ha sido recibida en Talentia!', company.name);
+        sendCompanyEmail(company.email, '¡Tu vacante ha sido recibida en Talentia!', company.name);
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: 'Error uploading company', error });
+        console.error(error);
+        res.status(500).json({ message: 'Error al registrar la empresa', error });
     }
-}
+};
+
 
 const uploadProposal = async (req, res) => {
     try {
