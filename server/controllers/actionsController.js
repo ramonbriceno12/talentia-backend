@@ -6,14 +6,14 @@ const calendlyClickedByUser = async (req, res) => {
     try {
         const email = decodeURIComponent(req.params.email.toLowerCase());
         console.log('Pasmos por aqui')
-        
+
         const user = await User.findOne({ where: { email } }); // Find user by email
-    
+
         if (!user) return res.status(404).json({ message: "User not found" });
-    
+
         user.calendly_clicked = true;
         await user.save();
-    
+
         res.json({ message: "Calendly clicked updated successfully" });
     } catch (error) {
         console.log(error);
@@ -24,14 +24,14 @@ const calendlyClickedByUser = async (req, res) => {
 const calendlyClickedByCompany = async (req, res) => {
     try {
         const email = decodeURIComponent(req.params.email.toLowerCase());
-    
+
         const company = await Company.findOne({ where: { email } }); // Find company by email
-    
+
         if (!company) return res.status(404).json({ message: "Company not found" });
-    
+
         company.calendly_clicked = true;
         await company.save();
-    
+
         res.json({ message: "Calendly clicked updated successfully" });
     } catch (error) {
         console.log(error);
@@ -40,19 +40,19 @@ const calendlyClickedByCompany = async (req, res) => {
 }
 
 const addSubscription = async (req, res) => {
-    
+
     try {
-        const {name, email} = req.body;
+        const { name, email } = req.body;
         const user = await User.findOne({ where: { email } });
 
-        if(!user){
+        if (!user) {
             await User.create({
                 full_name: name,
                 email,
                 role: 'talent',
                 subscribed: true,
             });
-        }else{
+        } else {
             user.subscribed = true;
             await user.save();
         }
@@ -71,21 +71,29 @@ const addSubscription = async (req, res) => {
 const sendImprovementEmail = async (req, res) => {
     try {
         // Fetch all users from the database
-        const users = await User.findAll({ attributes: ['full_name', 'email'] });
+        const users = await User.findAll({
+            attributes: ['full_name', 'email'],
+            where: { email_sent: false }
+        });
+
 
         if (!users || users.length === 0) {
             return res.status(404).json({ message: "No users found" });
         }
 
+
         // Send an improvement email to each user
         for (const user of users) {
             console.log('Sending email to:', user.email);
-            
+
             await sendImproveProfileEmail(
                 user.email,
                 '⚠️ Tu perfil puede estar limitando tus oportunidades… Descubre cómo mejorar 📥',
                 user.full_name
             );
+
+            user.email_sent = true;
+            await user.save();
         }
 
         res.status(200).json({ message: "Emails sent successfully to all users" });

@@ -5,16 +5,82 @@ const resumeImprovementEmailTemplate = (talentName) => `
     <meta charset="UTF-8">
     <title>🔥 Oferta Especial: Mejora tu Perfil Profesional 🚀</title>
     <style>
-      body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
-      .container { background: white; padding: 30px; border-radius: 10px; max-width: 650px; margin: auto; }
-      .button { background: #244c56; color: white; text-decoration: none; padding: 15px 25px; font-size: 20px; border-radius: 5px; display: inline-block; font-weight: bold; margin-top: 15px; }
-      .logo-container { text-align: center; padding-bottom: 20px; }
-      .logo { width: 160px; display: block; margin: 0 auto; }
-      .footer { font-size: 14px; color: #666; margin-top: 25px; }
-      .highlight { font-size: 26px; font-weight: bold; color: #d9534f; }
-      .price-box { background: #fff9c4; padding: 20px; margin: 15px 0; border-radius: 8px; font-size: 20px; font-weight: bold; }
-      .old-price { text-decoration: line-through; color: #d9534f; font-size: 22px; }
-      .new-price { color: #28a745; font-size: 26px; }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #244c56 !important;
+        padding: 20px;
+        color: #333;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: auto;
+        text-align: center;
+      }
+
+      .button {
+        background: #244c56;
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        display: inline-block;
+        font-weight: bold;
+        margin-top: 15px;
+      }
+
+      .logo-container {
+        text-align: center;
+        padding-bottom: 20px;
+      }
+
+      .logo {
+        width: 150px;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .footer {
+        font-size: 12px;
+        color: #666;
+        margin-top: 25px;
+      }
+
+      .highlight {
+        font-size: 26px;
+        font-weight: bold;
+        color: #d9534f;
+      }
+
+      .plan-box {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        text-align: left;
+      }
+
+      .plan-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .old-price {
+        text-decoration: line-through;
+        color: #d9534f;
+        font-size: 16px;
+      }
+
+      .new-price {
+        color: #28a745;
+        font-size: 21px;
+      }
     </style>
   </head>
   <body>
@@ -32,25 +98,25 @@ const resumeImprovementEmailTemplate = (talentName) => `
 
       <h3>🔥 ¡Aprovecha esta promoción por tiempo limitado! 🔥</h3>
 
-      <div class="price-box">
-        ✅ <strong>Actualización de CV</strong>  
-        <br>✏️ <span class="old-price">$30</span> → <span class="new-price">$15</span>  
-        <br>🔹 Optimización de contenido y formato profesional.
-        <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+      <div class="plan-box">
+        <div class="plan-title">✅ Optimización de CV</div>
+        <span class="old-price">$15</span> → <span class="new-price">$5</span>
+        <p>🔹 Optimización de contenido y formato profesional.</p>
+        <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color: white !important;">📆 Agendar</a>
       </div>
 
-      <div class="price-box">
-        ✅ <strong>CV + LinkedIn + Portafolio</strong>  
-        <br>💼 <span class="old-price">$50</span> → <span class="new-price">$30</span>  
-        <br>🔹 Mejora tu presencia profesional en todas las plataformas clave.
-        <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+      <div class="plan-box">
+        <div class="plan-title">✅ CV + LinkedIn + Portafolio</div>
+        <span class="old-price">$30</span> → <span class="new-price">$15</span>
+        <p>🔹 Mejora tu presencia profesional en todas las plataformas clave.</p>
+        <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color: white !important;">📆 Agendar</a>
       </div>
 
-      <div class="price-box">
-        ✅ <strong>Creación Completa (CV + LinkedIn + Portafolio Online)</strong>  
-        <br>🌐 <span class="old-price">$100</span> → <span class="new-price">$50</span>  
-        <br>🔹 Creamos todo desde cero con un portafolio web personalizado.
-        <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+      <div class="plan-box">
+        <div class="plan-title">✅ Creación Completa (CV + LinkedIn + Portafolio Online)</div>
+        <span class="old-price">$50</span> → <span class="new-price">$30</span>
+        <p>🔹 Creamos todo desde cero con un portafolio web personalizado.</p>
+        <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color: white !important;">📆 Agendar</a>
       </div>
 
       <p>⚡ ¡No dejes pasar esta oferta! Mejora tu perfil y aumenta tus oportunidades laborales. 🚀</p>
