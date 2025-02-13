@@ -1,6 +1,6 @@
 const talentEmailTemplate = (name, email) => `
   <!DOCTYPE html>
-  <html>
+<html>
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +12,7 @@ const talentEmailTemplate = (name, email) => `
         width: 100%;
         background-color: #244c56 !important;
         text-align: center;
+        font-family: Arial, sans-serif;
       }
 
       .logo-container {
@@ -31,57 +32,55 @@ const talentEmailTemplate = (name, email) => `
         border-radius: 10px;
         padding: 20px;
         text-align: center;
-        font-family: Arial, sans-serif;
       }
 
       .button {
         background: #244c56;
         color: white;
         text-decoration: none;
-        padding: 10px 20px;
+        padding: 12px 20px;
         border-radius: 5px;
         display: inline-block;
-        margin-top: 20px;
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: bold;
       }
 
-      .calendly-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: #006bff;
-        color: white;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 14px;
+      .plan-box {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        text-align: left;
+      }
+
+      .plan-title {
+        font-size: 18px;
         font-weight: bold;
-        margin-top: 20px;
+        color: #333;
+      }
+
+      .plan-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #28a745;
+      }
+
+      .old-price {
+        text-decoration: line-through;
+        color: #d9534f;
+        font-size: 16px;
+      }
+
+      .new-price {
+        color: #28a745;
+        font-size: 21px;
       }
 
       .footer {
         font-size: 12px;
         color: #666;
         margin-top: 20px;
-      }
-
-      .price-box {
-        background: #fff9c4;
-        padding: 20px;
-        margin: 15px 0;
-        border-radius: 8px;
-        font-size: 18px;
-        font-weight: bold;
-      }
-
-      .old-price {
-        text-decoration: line-through;
-        color: #d9534f;
-        font-size: 20px;
-      }
-
-      .new-price {
-        color: #28a745;
-        font-size: 24px;
       }
     </style>
   </head>
@@ -105,15 +104,6 @@ const talentEmailTemplate = (name, email) => `
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
-                <h3 style="color: #333;">🎯 Checklist de Optimización Profesional</h3>
-                <p style="font-size: 16px; color: #666;">
-                  Te dejamos un <strong><a style="" href="https://talentiave.com/assets/pdf/Checklist_Optimizacion_Profesional.pdf">checklist en PDF</a></strong> con los pasos clave para mejorar tu perfil profesional.  
-                  <strong>Si deseas que nosotros lo hagamos por ti, guiándote en cada paso, <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}">agenda una reunión con nosotros</a>.</strong>
-                  ¡Será un placer conocerte y explorar nuevas oportunidades juntos!
-                </p>
-
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
-
                 <h3>📢 ¡Tu perfil estará disponible pronto!</h3>
                 <p style="font-size: 16px; color: #333;">
                   Actualmente, tu perfil está en proceso de revisión. En un plazo de <strong>2-3 días</strong>, 
@@ -128,28 +118,35 @@ const talentEmailTemplate = (name, email) => `
 
                 <h3>🚀 Mejora tu Perfil Profesional con Nuestros Planes</h3>
 
-                <div class="price-box">
-                  ✅ <strong>Actualización de CV</strong>  
-                  <br>✏️ <span class="old-price">$30</span> → <span class="new-price">$15</span>  
-                  <br>🔹 Optimización de contenido y formato profesional.
-                  <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+                <div class="plan-box">
+                  <div class="plan-title">✅ Optimización de CV</div>
+                  <span class="old-price">$15</span> → <span class="new-price">$5</span>
+                  <p>🔹 Revisión y mejora de contenido y formato.</p>
+                  <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar</a>
                 </div>
 
-                <div class="price-box">
-                  ✅ <strong>CV + LinkedIn + Portafolio</strong>  
-                  <br>💼 <span class="old-price">$50</span> → <span class="new-price">$30</span>  
-                  <br>🔹 Mejora tu presencia profesional en todas las plataformas clave.
-                  <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+                <div class="plan-box">
+                  <div class="plan-title">✅ CV + LinkedIn</div>
+                  <span class="old-price">$30</span> → <span class="new-price">$15</span>
+                  <p>🔹 Optimización de perfil y CV para mayor visibilidad.</p>
+                  <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar</a>
                 </div>
 
-                <div class="price-box">
-                  ✅ <strong>Creación Completa (CV + LinkedIn + Portafolio Online)</strong>  
-                  <br>🌐 <span class="old-price">$100</span> → <span class="new-price">$50</span>  
-                  <br>🔹 Creamos todo desde cero con un portafolio web personalizado.
-                  <br>🔹 <strong>¡Además, te ayudamos con tu búsqueda de empleo!</strong>  
-                  <br>📌 Te guiamos en cada paso para aplicar a oportunidades que se ajusten a tu perfil.
-                  <br><a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar Ahora</a>
+                <div class="plan-box">
+                  <div class="plan-title">✅ CV + LinkedIn + Portafolio Online</div>
+                  <span class="old-price">$50</span> → <span class="new-price">$30</span>
+                  <p>🔹 Creación de un portafolio web y optimización de CV y LinkedIn.</p>
+                  <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar</a>
                 </div>
+
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
+
+                <h3 style="color: #333;">🎯 Checklist de Optimización Profesional</h3>
+                <p style="font-size: 16px; color: #666;">
+                  Te dejamos un <strong><a href="https://talentiave.com/assets/pdf/Checklist_Optimizacion_Profesional.pdf">checklist en PDF</a></strong> con los pasos clave para mejorar tu perfil profesional.  
+                  <strong>Si deseas que nosotros lo hagamos por ti, guiándote en cada paso, <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}">agenda una reunión con nosotros</a>.</strong>
+                  ¡Será un placer conocerte y explorar nuevas oportunidades juntos!
+                </p>
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
@@ -163,7 +160,7 @@ const talentEmailTemplate = (name, email) => `
       </tr>
     </table>
   </body>
-  </html>
+</html>
 `;
 
 module.exports = talentEmailTemplate;
