@@ -1,9 +1,12 @@
 const Links = require("../models/linksModel");
 const Clicks = require("../models/clicksModel");
+const { or } = require("sequelize");
 
 const getAllLinks = async (req, res) => {
     try {
-        const links = await Links.findAll();
+        const links = await Links.findAll({
+            order: [['id', 'ASC']]
+        });
         res.status(200).json(links);
     } catch (error) {
         console.error(error);

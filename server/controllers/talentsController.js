@@ -7,7 +7,7 @@ const UserSkills = require("../models/userSkills");
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
     try {
-        const { search, is_featured } = req.query;
+        const { search, job_title } = req.query;
 
         const whereClause = {};
 
@@ -23,7 +23,7 @@ exports.getAllTalents = async (req, res) => {
         const talents = await User.findAll({
             where: whereClause,
             attributes: [
-                "id", "full_name", "email", "bio", "profile_picture", "resume_file", 
+                "id", "full_name", "email", "bio", "profile_picture", "resume_file",
                 "is_featured", "createdAt", "updatedAt",
                 [
                     Sequelize.literal(`(
@@ -38,7 +38,8 @@ exports.getAllTalents = async (req, res) => {
                 {
                     model: JobTitle,
                     attributes: ["title"],
-                    as: "job_title"
+                    as: "job_title",
+                    ...(job_title ? { where: { title: { [Op.iLike]: `%${job_title}%` } } } : {})
                 },
                 {
                     model: Skills,
@@ -47,7 +48,7 @@ exports.getAllTalents = async (req, res) => {
                     through: { attributes: [] }
                 }
             ],
-            order: [[Sequelize.literal("skill_count"), "DESC"], ["createdAt", "DESC"]] // Sort by skill count, then by latest created
+            order: [[Sequelize.literal("skill_count"), "DESC"], ["createdAt", "DESC"]]
         });
 
         res.json(talents);
@@ -56,6 +57,7 @@ exports.getAllTalents = async (req, res) => {
         res.status(500).json({ message: "Error fetching talents" });
     }
 };
+
 
 // Get talent by ID
 exports.getTalentById = async (req, res) => {
