@@ -73,7 +73,7 @@ const sendImprovementEmail = async (req, res) => {
         // Fetch users with email_sent = false and include the primary key
         const users = await User.findAll({
             attributes: ['id', 'full_name', 'email'],  // Include the primary key
-            where: { email_sent: false }
+            where: { email_sent: false, is_featured: true }
         });
 
         if (!users || users.length === 0) {
