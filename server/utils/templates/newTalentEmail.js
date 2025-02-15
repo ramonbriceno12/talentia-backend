@@ -35,7 +35,7 @@ const talentEmailTemplate = (name, email) => `
       }
 
       .button {
-        background: #244c56;
+        background: #349390;
         color: white;
         text-decoration: none;
         padding: 12px 20px;
@@ -46,35 +46,42 @@ const talentEmailTemplate = (name, email) => `
         font-weight: bold;
       }
 
+      .plans-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
       .plan-box {
+        background: #f9f9f9;
         border: 1px solid #ddd;
-        padding: 15px;
-        margin: 10px 0;
-        border-radius: 8px;
-        text-align: left;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
       }
 
       .plan-title {
         font-size: 18px;
         font-weight: bold;
         color: #333;
+        margin-bottom: 10px;
       }
 
-      .plan-price {
-        font-size: 20px;
-        font-weight: bold;
-        color: #28a745;
+      .plan-description {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 10px;
       }
 
-      .old-price {
-        text-decoration: line-through;
-        color: #d9534f;
-        font-size: 16px;
+      .plan-features {
+        text-align: left;
+        padding-left: 20px;
+        font-size: 14px;
+        color: #333;
       }
 
-      .new-price {
-        color: #28a745;
-        font-size: 21px;
+      .plan-features li {
+        margin-bottom: 5px;
       }
 
       .footer {
@@ -106,47 +113,62 @@ const talentEmailTemplate = (name, email) => `
 
                 <h3>📢 ¡Tu perfil estará disponible pronto!</h3>
                 <p style="font-size: 16px; color: #333;">
-                  Actualmente, tu perfil está en proceso de revisión. En un plazo de <strong>2-3 días</strong>, 
+                  Actualmente, tu perfil está en proceso de revisión. En breve, 
                   optimizaremos tu bio y estarás publicado en la sección de talentos de <strong>Talentia</strong>.  
                   Puedes ver la sección aquí: 
                   <a href="https://talentiave.com/talents" style="color: #006bff; text-decoration: none;">Talentos Talentia</a>.  
                 </p>
 
-                <p style="font-size: 14px; color: #666;">
-                  **Mientras tanto, ¿quieres mejorar aún más tu perfil?** 🚀 Echa un vistazo a nuestras opciones profesionales:
-                </p>
-
-                <h3>🚀 Mejora tu Perfil Profesional con Nuestros Planes</h3>
-
-                <div class="plan-box">
-                  <div class="plan-title">✅ Optimización de CV</div>
-                  <span class="old-price">$15</span> → <span class="new-price">$5</span>
-                  <p>🔹 Revisión y mejora de contenido y formato.</p>
-                  <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar</a>
-                </div>
-
-                <div class="plan-box">
-                  <div class="plan-title">✅ CV + LinkedIn</div>
-                  <span class="old-price">$30</span> → <span class="new-price">$15</span>
-                  <p>🔹 Optimización de perfil y CV para mayor visibilidad.</p>
-                  <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar</a>
-                </div>
-
-                <div class="plan-box">
-                  <div class="plan-title">✅ CV + LinkedIn + Portafolio Online</div>
-                  <span class="old-price">$50</span> → <span class="new-price">$30</span>
-                  <p>🔹 Creación de un portafolio web y optimización de CV y LinkedIn.</p>
-                  <a href="https://calendly.com/talentiave/cv-optimization" class="button" style="color:white !important;">📆 Agendar</a>
-                </div>
-
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
-                <h3 style="color: #333;">🎯 Checklist de Optimización Profesional</h3>
-                <p style="font-size: 16px; color: #666;">
-                  Te dejamos un <strong><a href="https://talentiave.com/assets/pdf/Checklist_Optimizacion_Profesional.pdf">checklist en PDF</a></strong> con los pasos clave para mejorar tu perfil profesional.  
-                  <strong>Si deseas que nosotros lo hagamos por ti, guiándote en cada paso, <a href="https://talentiave.com/actions/calendly-link?email=${email}&name=${name}">agenda una reunión con nosotros</a>.</strong>
-                  ¡Será un placer conocerte y explorar nuevas oportunidades juntos!
-                </p>
+                <h3>🚀 Mejora tu Perfil Profesional</h3>
+
+                <div class="plans-container">
+                  <!-- Plan Talento -->
+                  <div class="plan-box">
+                    <div class="plan-title">🎯 Plan Talento</div>
+                    <p class="plan-description">🔥 Optimiza tu perfil y destaca entre los mejores talentos.</p>
+                    <ul class="plan-features">
+                      <li>✅ Revisión y optimización de CV</li>
+                      <li>✅ Mejora de perfil en LinkedIn</li>
+                      <li>✅ Asesoría en portfolio y presencia online</li>
+                      <li>✅ Entrenamiento para entrevistas</li>
+                      <li>✅ Acceso a oportunidades exclusivas</li>
+                      <li>✅ Recomendaciones personalizadas de vacantes</li>
+                    </ul>
+                    <a href="https://calendly.com/contacto-talentiave/optimizacion-de-perfil-profesional" class="button">📆 Agendar sesión</a>
+                  </div>
+
+                  <!-- Plan Reclutador -->
+                  <div class="plan-box">
+                    <div class="plan-title">📢 Plan Reclutador</div>
+                    <p class="plan-description">🚀 Publicamos tu vacante y encontramos a los mejores candidatos.</p>
+                    <ul class="plan-features">
+                      <li>✅ Publicación de oferta en nuestra plataforma</li>
+                      <li>✅ Difusión en redes sociales y canales especializados</li>
+                      <li>✅ Selección y filtrado de candidatos</li>
+                      <li>✅ Entrevistas pre-filtro y evaluación de habilidades</li>
+                      <li>✅ Contacto directo con los mejores perfiles</li>
+                      <li>✅ Reporte detallado de los mejores candidatos</li>
+                    </ul>
+                    <a href="https://calendly.com/contacto-talentiave/30min" class="button">📆 Agendar sesión</a>
+                  </div>
+
+                  <!-- Plan Empresa -->
+                  <div class="plan-box">
+                    <div class="plan-title">🏢 Plan Empresa</div>
+                    <p class="plan-description">💼 Gestionamos todas tus vacantes y encontramos el talento ideal para tu empresa.</p>
+                    <ul class="plan-features">
+                      <li>✅ Gestión completa del proceso de selección</li>
+                      <li>✅ Creación y difusión de todas tus ofertas</li>
+                      <li>✅ Evaluación técnica y cultural de candidatos</li>
+                      <li>✅ Optimización del proceso de contratación</li>
+                      <li>✅ Asesoría en estrategias de reclutamiento</li>
+                      <li>✅ Soporte continuo y seguimiento post-contratación</li>
+                    </ul>
+                    <a href="https://calendly.com/contacto-talentiave/company-onboarding-meeting" class="button">📆 Agendar sesión</a>
+                  </div>
+                </div>
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
 
