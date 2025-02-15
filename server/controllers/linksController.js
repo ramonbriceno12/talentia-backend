@@ -5,7 +5,7 @@ const { or } = require("sequelize");
 const getAllLinks = async (req, res) => {
     try {
         const links = await Links.findAll({
-            order: [['id', 'ASC']]
+            order: [['order', 'ASC']]
         });
         res.status(200).json(links);
     } catch (error) {
