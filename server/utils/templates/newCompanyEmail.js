@@ -46,18 +46,13 @@ const companyEmailTemplate = (companyName, email) => `
         font-weight: bold;
       }
 
-      .plans-container {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
       .plan-box {
         background: #f9f9f9;
         border: 1px solid #ddd;
         padding: 20px;
         border-radius: 10px;
         text-align: center;
+        margin-bottom: 15px;
       }
 
       .plan-title {
@@ -114,41 +109,45 @@ const companyEmailTemplate = (companyName, email) => `
 
                 <h3>💼 Encuentra el Talento Ideal</h3>
 
-                <div class="plans-container">
-                  <!-- Plan Reclutador -->
-                  <div class="plan-box">
-                    <div class="plan-title">📢 Plan Reclutador</div>
-                    <p class="plan-description">🚀 Publicamos tu vacante y encontramos a los mejores candidatos.</p>
-                    <ul class="plan-features">
-                      <li>✅ Publicación de oferta en nuestra plataforma</li>
-                      <li>✅ Difusión en redes sociales y canales especializados</li>
-                      <li>✅ Selección y filtrado de candidatos</li>
-                      <li>✅ Entrevistas pre-filtro y evaluación de habilidades</li>
-                      <li>✅ Contacto directo con los mejores perfiles</li>
-                      <li>✅ Reporte detallado de los mejores candidatos</li>
-                    </ul>
-                    <a href="https://calendly.com/contacto-talentiave/30min" class="button">📆 Agendar sesión</a>
-                  </div>
+                <!-- Plan Reclutador -->
+                <table role="presentation" class="plan-box" width="100%">
+                  <tr>
+                    <td>
+                      <div class="plan-title">📢 Plan Reclutador</div>
+                      <p class="plan-description">🚀 Publicamos tu vacante y encontramos a los mejores candidatos.</p>
+                      <ul class="plan-features">
+                        <li>✅ Publicación de oferta en nuestra plataforma</li>
+                        <li>✅ Difusión en redes sociales y canales especializados</li>
+                        <li>✅ Selección y filtrado de candidatos</li>
+                        <li>✅ Entrevistas pre-filtro y evaluación de habilidades</li>
+                        <li>✅ Contacto directo con los mejores perfiles</li>
+                        <li>✅ Reporte detallado de los mejores candidatos</li>
+                      </ul>
+                      <a href="https://calendly.com/contacto-talentiave/30min" class="button" style="color:white !important;">📆 Agendar sesión</a>
+                    </td>
+                  </tr>
+                </table>
 
-                  <!-- Plan Empresa -->
-                  <div class="plan-box">
-                    <div class="plan-title">🏢 Plan Empresa</div>
-                    <p class="plan-description">💼 Gestionamos todas tus vacantes y encontramos el talento ideal para tu empresa.</p>
-                    <ul class="plan-features">
-                      <li>✅ Gestión completa del proceso de selección</li>
-                      <li>✅ Creación y difusión de todas tus ofertas</li>
-                      <li>✅ Evaluación técnica y cultural de candidatos</li>
-                      <li>✅ Optimización del proceso de contratación</li>
-                      <li>✅ Asesoría en estrategias de reclutamiento</li>
-                      <li>✅ Soporte continuo y seguimiento post-contratación</li>
-                    </ul>
-                    <a href="https://calendly.com/contacto-talentiave/company-onboarding-meeting" class="button">📆 Agendar sesión</a>
-                  </div>
-                </div>
+                <!-- Plan Empresa -->
+                <table role="presentation" class="plan-box" width="100%">
+                  <tr>
+                    <td>
+                      <div class="plan-title">🏢 Plan Empresa</div>
+                      <p class="plan-description">💼 Gestionamos todas tus vacantes y encontramos el talento ideal para tu empresa.</p>
+                      <ul class="plan-features">
+                        <li>✅ Gestión completa del proceso de selección</li>
+                        <li>✅ Creación y difusión de todas tus ofertas</li>
+                        <li>✅ Evaluación técnica y cultural de candidatos</li>
+                        <li>✅ Optimización del proceso de contratación</li>
+                        <li>✅ Asesoría en estrategias de reclutamiento</li>
+                        <li>✅ Soporte continuo y seguimiento post-contratación</li>
+                      </ul>
+                      <a href="https://calendly.com/contacto-talentiave/company-onboarding-meeting" class="button" style="color:white !important;">📆 Agendar sesión</a>
+                    </td>
+                  </tr>
+                </table>
 
                 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
-
-                <a href="https://talentiave.com" class="button">🌐 Visitar Talentia</a>
 
                 <p class="footer">
                   © ${new Date().getFullYear()} Talentia. Todos los derechos reservados.
