@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.717.0",
     "@aws-sdk/lib-storage": "^3.717.0",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -23,6 +24,7 @@
     "nodemon": "^3.1.9",
     "openai": "^4.83.0",
     "pg": "^8.13.1",
+    "puppeteer": "^24.2.1",
     "sequelize": "^6.37.5",
     "socket.io": "^4.8.1"
   }

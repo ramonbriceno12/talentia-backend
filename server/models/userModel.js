@@ -3,7 +3,6 @@ require("dotenv").config();
 
 const sequelize = require("../config/database");
 const JobTitle = require("./jobTitles");
-const UserSkills = require("./userSkills");
 
 const User = sequelize.define(
   "User",

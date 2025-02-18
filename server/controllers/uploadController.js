@@ -5,6 +5,7 @@ const JobTitle = require('../models/jobTitles');
 const Skills = require('../models/skillsModel');
 const UserSkills = require('../models/userSkills');
 const Proposal = require('../models/proposalsModel');
+const UserLinks = require('../models/userLinksModel')
 const { uploadToS3 } = require('../middleware/upload');
 const e = require('express');
 const { sendCompanyEmail, sendTalentEmail, sendProposalUserEmail, sendProposalAdminEmail, sendTalentProposalEmail } = require('../utils/sendEmails');
@@ -115,7 +116,6 @@ const uploadTalent = async (req, res) => {
         const jobTitle = await JobTitle.findOne({ where: { title: req.body.job_title } });
 
         let user = null;
-        console.log(req.body.country,' PAISSSSS')
         if (existingUser) {
             user = existingUser;
             await User.update(
@@ -144,7 +144,7 @@ const uploadTalent = async (req, res) => {
             });
         }
 
-        // 🔹 Fix: Handle Skills Correctly
+        // 🔹 Handle Skills
         if (req.body.skills && typeof req.body.skills === "string") {
             const skills = req.body.skills.split(",").map(skill => skill.trim()); // Ensure it's properly split
             for (const skill of skills) {
@@ -153,6 +153,38 @@ const uploadTalent = async (req, res) => {
                     await UserSkills.create({
                         user_id: user.id,
                         skill_id: existingSkill.id,
+                    });
+                }
+            }
+        }
+
+        // 🔹 Handle Links
+        if (req.body.links) {
+            let linksArray;
+            try {
+                // Ensure links are parsed correctly
+                linksArray = typeof req.body.links === "string" ? JSON.parse(req.body.links) : req.body.links;
+
+                if (!Array.isArray(linksArray)) {
+                    return res.status(400).json({ message: "Invalid links format. Expected an array." });
+                }
+            } catch (error) {
+                return res.status(400).json({ message: "Invalid JSON format for links.", error });
+            }
+
+            // 🔹 Filter valid links (only those that have both link_type and url)
+            const validLinks = linksArray.filter(link => link.link_type && link.url);
+
+            if (validLinks.length > 0) {
+                // 🔹 Delete existing links only if new valid links are available
+                await UserLinks.destroy({ where: { user_id: user.id } });
+
+                // Insert only valid links
+                for (const link of validLinks) {
+                    await UserLinks.create({
+                        user_id: user.id,
+                        link_type: link.link_type,
+                        url: link.url,
                     });
                 }
             }
@@ -182,7 +214,7 @@ const uploadCompany = async (req, res) => {
         }
 
         // If no file, check if a jobRequirementsLink is provided
-        if(req.body.jobRequirementsLink) {
+        if (req.body.jobRequirementsLink) {
             fileUrl = req.body.jobRequirementsLink;
         }
 
@@ -199,11 +231,11 @@ const uploadCompany = async (req, res) => {
         if (existingCompany) {
             company = existingCompany;
             await Company.update(
-                { 
+                {
                     requirements_file: fileUrl,
                     name: req.body.name,
                     address: req.body.address,
-                    country: req.body.country 
+                    country: req.body.country
                 },
                 { where: { id: company.id } }
             );
@@ -271,7 +303,7 @@ const uploadProposal = async (req, res) => {
         // 🔹 5️⃣ Enviar correos electrónicos
 
         await sendProposalUserEmail(email, "📩 Propuesta Enviada con Éxito", proposalUser.full_name);
-        await sendProposalAdminEmail("🚀 Nueva Propuesta Recibida", talent.email, proposalUser.email, talent.resume_file, description );
+        await sendProposalAdminEmail("🚀 Nueva Propuesta Recibida", talent.email, proposalUser.email, talent.resume_file, description);
         await sendTalentProposalEmail(talent.email, "🎯 Interés en tu Perfil en Talentia", talent.full_name);
 
         res.status(201).json({ message: "Propuesta enviada exitosamente", proposal: newProposal });
