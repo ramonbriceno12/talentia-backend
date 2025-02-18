@@ -34,7 +34,17 @@ const User = sequelize.define(
     subscribed: { type: DataTypes.BOOLEAN, defaultValue: false },
     email_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
     email_visibility_sent: {type: DataTypes.BOOLEAN, defaultValue: false},
-    country: {type: DataTypes.STRING, defaultValue: 'N/A'}
+    country: {type: DataTypes.STRING, defaultValue: 'N/A'},
+    years_of_experience: {
+      type: DataTypes.INTEGER,
+      allowNull: true, 
+      default: null
+    },
+    expected_salary: {
+      type: DataTypes.DECIMAL(10, 2), 
+      allowNull: true,
+      defaultValue: 0.00,
+    }
   },
   {
     tableName: "users",

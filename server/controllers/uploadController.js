@@ -124,6 +124,8 @@ const uploadTalent = async (req, res) => {
                     profile_picture: avatarUrl || user.profile_picture,
                     job_title_id: jobTitle.id,
                     country: req.body.country || user.country,
+                    years_of_experience: req.body.years_of_experience || user.years_of_experience,
+                    expected_salary: req.body.expected_salary || user.expected_salary,
                 },
                 { where: { id: user.id } }
             );
@@ -136,7 +138,9 @@ const uploadTalent = async (req, res) => {
                 profile_picture: avatarUrl,
                 plan_id: req.body.plan_id,
                 job_title_id: jobTitle.id,
-                country: req.body.country
+                country: req.body.country,
+                years_of_experience: req.body.years_of_experience,
+                expected_salary: req.body.expected_salary,
             });
         }
 
