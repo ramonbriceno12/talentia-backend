@@ -24,7 +24,7 @@ exports.getAllTalents = async (req, res) => {
             where: whereClause,
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture", "resume_file",
-                "is_featured", "createdAt", "updatedAt",
+                "is_featured", "createdAt", "updatedAt", "country", "years_of_experience", "expected_salary",
                 [
                     Sequelize.literal(`(
                         SELECT COUNT(*)
