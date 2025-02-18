@@ -54,6 +54,7 @@ const Company = sequelize.define(
       field: "updated_at",
     },
     calendly_clicked: { type: DataTypes.BOOLEAN, defaultValue: false },
+    country: {type: DataTypes.STRING, defaultValue: 'N/A'}
   },
   {
     tableName: "companies",

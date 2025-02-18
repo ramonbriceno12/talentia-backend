@@ -115,7 +115,7 @@ const uploadTalent = async (req, res) => {
         const jobTitle = await JobTitle.findOne({ where: { title: req.body.job_title } });
 
         let user = null;
-
+        console.log(req.body.country,' PAISSSSS')
         if (existingUser) {
             user = existingUser;
             await User.update(
@@ -123,6 +123,7 @@ const uploadTalent = async (req, res) => {
                     resume_file: resumeUrl || user.resume_file, // Only update if new file is uploaded
                     profile_picture: avatarUrl || user.profile_picture,
                     job_title_id: jobTitle.id,
+                    country: req.body.country || user.country,
                 },
                 { where: { id: user.id } }
             );
@@ -135,6 +136,7 @@ const uploadTalent = async (req, res) => {
                 profile_picture: avatarUrl,
                 plan_id: req.body.plan_id,
                 job_title_id: jobTitle.id,
+                country: req.body.country
             });
         }
 
@@ -196,7 +198,8 @@ const uploadCompany = async (req, res) => {
                 { 
                     requirements_file: fileUrl,
                     name: req.body.name,
-                    address: req.body.address, 
+                    address: req.body.address,
+                    country: req.body.country 
                 },
                 { where: { id: company.id } }
             );
@@ -206,6 +209,7 @@ const uploadCompany = async (req, res) => {
                 name: req.body.name,
                 requirements_file: fileUrl,
                 address: req.body.address,
+                country: req.body.country
             });
         }
 
