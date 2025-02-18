@@ -132,7 +132,7 @@ const talentEmailTemplate = (name, email) => `
                         <li>✅ Acceso a oportunidades exclusivas</li>
                         <li>✅ Recomendaciones personalizadas de vacantes</li>
                       </ul>
-                      <a href="https://calendly.com/contacto-talentiave/optimizacion-de-perfil-profesional" class="button" style="color:white !important;">📆 Agendar sesión</a>
+                      <a href="https://calendly.com/contacto-talentiave/" class="button" style="color:white !important;">📆 Agendar sesión</a>
                     </td>
                   </tr>
                 </table>
@@ -151,7 +151,7 @@ const talentEmailTemplate = (name, email) => `
                         <li>✅ Contacto directo con los mejores perfiles</li>
                         <li>✅ Reporte detallado de los mejores candidatos</li>
                       </ul>
-                      <a href="https://calendly.com/contacto-talentiave/30min" class="button" style="color:white !important;">📆 Agendar sesión</a>
+                      <a href="https://calendly.com/contacto-talentiave/" class="button" style="color:white !important;">📆 Agendar sesión</a>
                     </td>
                   </tr>
                 </table>
@@ -170,7 +170,7 @@ const talentEmailTemplate = (name, email) => `
                         <li>✅ Asesoría en estrategias de reclutamiento</li>
                         <li>✅ Soporte continuo y seguimiento post-contratación</li>
                       </ul>
-                      <a href="https://calendly.com/contacto-talentiave/company-onboarding-meeting" class="button" style="color:white !important;">📆 Agendar sesión</a>
+                      <a href="https://calendly.com/contacto-talentiave/" class="button" style="color:white !important;">📆 Agendar sesión</a>
                     </td>
                   </tr>
                 </table>

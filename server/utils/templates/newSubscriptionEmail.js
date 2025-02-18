@@ -147,7 +147,7 @@ const newSubscriptionEmail = (name, email) => `
                                     <p>🔹 Revisión y mejora de contenido y
                                         formato.</p>
                                     <a
-                                        href="https://calendly.com/talentiave/cv-optimization"
+                                        href="https://calendly.com/talentiave/"
                                         class="button" style="color:white !important;">📆 Agendar</a>
                                 </div>
 
@@ -159,7 +159,7 @@ const newSubscriptionEmail = (name, email) => `
                                     <p>🔹 Optimización de perfil y CV para mayor
                                         visibilidad.</p>
                                     <a
-                                        href="https://calendly.com/talentiave/cv-optimization"
+                                        href="https://calendly.com/talentiave/"
                                         class="button" style="color:white !important;">📆 Agendar</a>
                                 </div>
 
@@ -171,7 +171,7 @@ const newSubscriptionEmail = (name, email) => `
                                     <p>🔹 Creación de un portafolio web y
                                         optimización de CV y LinkedIn.</p>
                                     <a
-                                        href="https://calendly.com/talentiave/cv-optimization"
+                                        href="https://calendly.com/talentiave/"
                                         class="button" style="color:white !important;">📆 Agendar</a>
                                 </div>
 
