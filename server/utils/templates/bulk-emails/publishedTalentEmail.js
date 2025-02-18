@@ -89,7 +89,7 @@ const talentVisibilityEmailTemplate = (talentName) => `
             <tr>
               <td>
                 <h2>🎉 ¡Felicidades, ${talentName}! 🎉</h2>
-                <p>Tu perfil ahora es visible en <strong>Talentiave</strong>, conectándote con empresas que buscan talento como el tuyo. 🚀</p>
+                <p>Tu perfil ahora es visible en <strong><a href="https://talentiave.com/talents">Talentiave</a></strong>, conectándote con empresas que buscan talento como el tuyo. 🚀</p>
                 
                 <p>💡 Para destacar aún más y aumentar tus posibilidades de ser contactado, revisa estos puntos clave:</p>
                 <ul class="plan-features">
