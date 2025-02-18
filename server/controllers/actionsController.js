@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const Company = require("../models/companiesModel");
-const { sendSubscriptionEmail, sendImproveProfileEmail } = require("../utils/sendEmails");
+const { sendSubscriptionEmail, sendImproveProfileEmail, sendPublishedTalentEmailBulk } = require("../utils/sendEmails");
 
 const calendlyClickedByUser = async (req, res) => {
     try {
@@ -105,6 +105,47 @@ const sendImprovementEmail = async (req, res) => {
     }
 };
 
+const sendPublishedTalentEmail = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: ['id', 'full_name', 'email'],  // Include the primary key
+            where: { email_visibility_sent: false, is_featured: true }
+        });
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: "No users found" });
+        }
+
+        // Send an improvement email to each user
+        for (const user of users) {
+            console.log('Sending email to:', user.email);
+            
+            await sendPublishedTalentEmailBulk(
+                user.email,
+                '🎉 ¡Tu perfil ya está público en Talentiave! 🚀 Empresas pueden verte 👀',
+                user.full_name
+            );
+
+            await User.update(
+                { email_visibility_sent: true },
+                { where: { id: user.id } }
+            );
+        }
+
+        res.status(200).json({ message: "Emails sent successfully to all users" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error sending emails" });
+    }
+}
 
 
-module.exports = { calendlyClickedByUser, calendlyClickedByCompany, addSubscription, sendImprovementEmail };
+
+module.exports = { 
+    calendlyClickedByUser, 
+    calendlyClickedByCompany, 
+    addSubscription, 
+    sendImprovementEmail,
+    sendPublishedTalentEmail 
+};

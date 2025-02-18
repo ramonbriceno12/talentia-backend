@@ -33,6 +33,7 @@ const User = sequelize.define(
     plan_id: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 1 },
     subscribed: { type: DataTypes.BOOLEAN, defaultValue: false },
     email_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+    email_visibility_sent: {type: DataTypes.BOOLEAN, defaultValue: false}
   },
   {
     tableName: "users",
