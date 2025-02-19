@@ -3,13 +3,16 @@ const Skill = require('../models/skillsModel');
 // Get all skills
 exports.getAllSkills = async (req, res) => {
     try {
-        const skills = await Skill.findAll();
+        const skills = await Skill.findAll({
+            order: [['name', 'ASC']] // Order by name in ascending order
+        });
         res.status(200).json(skills);
     } catch (error) {
         console.error('Error fetching skills:', error);
         res.status(500).json({ message: 'Error fetching skills' });
     }
 };
+
 
 // Get skill by ID
 exports.getSkillById = async (req, res) => {

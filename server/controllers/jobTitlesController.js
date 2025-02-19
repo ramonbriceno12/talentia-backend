@@ -3,7 +3,9 @@ const { fn, col } = require('sequelize');  // Import Sequelize functions directl
 
 exports.getAllJobTitles = async (req, res) => {
     try {
-        const jobTitles = await JobTitle.findAll();
+        const jobTitles = await JobTitle.findAll({
+            order: [['title', 'ASC']] // Order by name in ascending order
+        });
         res.json(jobTitles);
     } catch (error) {
         console.error(error);
