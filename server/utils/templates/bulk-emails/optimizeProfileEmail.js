@@ -89,7 +89,7 @@ const resumeImprovementEmailTemplate = (talentName) => `
             <tr>
               <td>
                 <h2>🚨 ¡Oferta Especial para Ti, ${talentName}! 🚨</h2>
-                <p>Hemos analizado tu perfil y tiene una efectividad de <span class="highlight">${Math.floor(Math.random() * 20) + 1}%</span>. Esto podría estar limitando tus oportunidades laborales. 📉</p>
+                <p>Hemos analizado tu perfil y tiene una efectividad de <span class="highlight">${Math.floor(Math.random() * (50 - 21 + 1)) + 21}%</span>. Esto podría estar limitando tus oportunidades laborales. 📉</p>
                 
                 <p>🔎 Razones por las que podrías estar perdiendo oportunidades:</p>
                 <ul class="plan-features">
