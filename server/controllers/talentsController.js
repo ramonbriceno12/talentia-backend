@@ -7,7 +7,7 @@ const UserSkills = require("../models/userSkills");
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
     try {
-        const { search, job_title } = req.query;
+        const { search, job_title, min_salary, max_salary } = req.query;
 
         const whereClause = {};
 
@@ -16,6 +16,12 @@ exports.getAllTalents = async (req, res) => {
                 { full_name: { [Op.iLike]: `%${search}%` } },
                 { bio: { [Op.iLike]: `%${search}%` } },
             ];
+        }
+
+        if (min_salary || max_salary) {
+            whereClause.expected_salary = {};
+            if (min_salary) whereClause.expected_salary[Op.gte] = parseFloat(min_salary);
+            if (max_salary) whereClause.expected_salary[Op.lte] = parseFloat(max_salary);
         }
 
         whereClause.is_featured = true;
@@ -66,7 +72,7 @@ exports.getTalentById = async (req, res) => {
         const talent = await User.findByPk(req.params.id, {
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture",
-                "resume_file", "is_featured", "createdAt"
+                "resume_file", "is_featured", "createdAt", "years_of_experience", "expected_salary"
             ],
             include: [
                 {
