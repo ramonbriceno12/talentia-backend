@@ -30,7 +30,7 @@ exports.getAllTalents = async (req, res) => {
             where: whereClause,
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture", "resume_file",
-                "is_featured", "createdAt", "updatedAt", "country", "years_of_experience", "expected_salary",
+                "is_featured", "createdAt", "updatedAt", "country", "years_of_experience", "expected_salary", "job_type_preference",
                 [
                     Sequelize.literal(`(
                         SELECT COUNT(*)
@@ -72,7 +72,7 @@ exports.getTalentById = async (req, res) => {
         const talent = await User.findByPk(req.params.id, {
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture",
-                "resume_file", "is_featured", "createdAt", "years_of_experience", "expected_salary"
+                "resume_file", "is_featured", "createdAt", "years_of_experience", "expected_salary", "job_type_preference"
             ],
             include: [
                 {

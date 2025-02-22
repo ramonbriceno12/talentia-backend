@@ -43,7 +43,13 @@ const User = sequelize.define(
       type: DataTypes.DECIMAL(10, 2), 
       allowNull: true,
       defaultValue: 0.00,
+    },
+    job_type_preference: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
     }
+    
   },
   {
     tableName: "users",

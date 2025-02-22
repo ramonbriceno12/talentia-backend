@@ -115,7 +115,13 @@ const uploadTalent = async (req, res) => {
         const existingUser = await User.findOne({ where: { email: req.body.email } });
         const jobTitle = await JobTitle.findOne({ where: { title: req.body.job_title } });
 
+        let jobType = req.body.job_type || "";
+        if (typeof jobType === "string") {
+            jobType = jobType.split("/").map(type => type.trim()).join("/");
+        }
+
         let user = null;
+
         if (existingUser) {
             user = existingUser;
             await User.update(
@@ -126,6 +132,7 @@ const uploadTalent = async (req, res) => {
                     country: req.body.country || user.country,
                     years_of_experience: req.body.years_of_experience || user.years_of_experience,
                     expected_salary: req.body.expected_salary || user.expected_salary,
+                    job_type_preference: jobType || user.job_type,
                 },
                 { where: { id: user.id } }
             );
@@ -141,6 +148,7 @@ const uploadTalent = async (req, res) => {
                 country: req.body.country,
                 years_of_experience: req.body.years_of_experience,
                 expected_salary: req.body.expected_salary,
+                job_type_preference: jobType,
             });
         }
 
