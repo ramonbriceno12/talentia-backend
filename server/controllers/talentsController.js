@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const JobTitle = require('../models/jobTitles');
 const Skills = require('../models/skillsModel');
 const { Op, Sequelize } = require('sequelize');
+const sequelize = require('../config/database');
 const UserSkills = require("../models/userSkills");
 const Resume = require("../models/resumesModel");
 const { uploadToS3, deleteFromS3 } = require('../middleware/upload');
@@ -71,7 +72,6 @@ exports.getAllTalents = async (req, res) => {
     }
 };
 
-
 // Get talent by ID
 exports.getTalentById = async (req, res) => {
     try {
@@ -79,7 +79,7 @@ exports.getTalentById = async (req, res) => {
         const talent = await User.findByPk(req.params.id, {
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture",
-                "is_featured", "createdAt", "years_of_experience", 
+                "is_featured", "createdAt", "years_of_experience",
                 "expected_salary", "job_type_preference", "headline"
             ],
             include: [
@@ -168,37 +168,47 @@ exports.deleteResume = async (req, res) => {
     }
 };
 
-
-
-// Create a new talent
-exports.createTalent = async (req, res) => {
-    const { email, password_hash, full_name, bio, profile_picture, resume_file, is_featured, plan_id } = req.body;
-
+exports.updateExperience = async (req, res) => {
     try {
-        const existingUser = await User.findOne({ where: { email } });
+        const { years_of_experience, expected_salary, job_type_preference } = req.body;
+        const { id } = req.params;
 
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists' });
+        const talent = await User.findByPk(id);
+        if (!talent) {
+            return res.status(404).json({ message: "Talent not found." });
         }
 
-        const newTalent = await User.create({
-            email,
-            password_hash,
-            full_name,
-            bio,
-            profile_picture,
-            resume_file,
-            is_featured,
-            role: 'talent',
-            plan_id
-        });
+        // ✅ Validate input
+        if (
+            (years_of_experience !== undefined && (isNaN(years_of_experience) || years_of_experience < 0)) ||
+            (expected_salary !== undefined && (isNaN(expected_salary) || expected_salary < 0))
+        ) {
+            return res.status(400).json({ message: "Years of experience and expected salary must be non-negative numbers." });
+        }
 
-        res.status(201).json({ message: 'Talent created successfully', talent: newTalent });
+        if (job_type_preference !== undefined && typeof job_type_preference !== "string") {
+            return res.status(400).json({ message: "Job type preference must be a string." });
+        }
+
+        // ✅ Find the talent by ID
+        
+
+        // ✅ Update the fields if provided
+        const updatedFields = {};
+        if (years_of_experience !== undefined) updatedFields.years_of_experience = years_of_experience;
+        if (expected_salary !== undefined) updatedFields.expected_salary = expected_salary;
+        if (job_type_preference !== undefined) updatedFields.job_type_preference = job_type_preference;
+
+        await talent.update(updatedFields);
+
+        // ✅ Return updated talent
+        return res.status(200).json({ message: "Experience & Salary updated successfully.", talent });
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error creating talent' });
+        console.error("Error updating experience & salary:", error);
+        return res.status(500).json({ message: "Error updating experience & salary. Please try again." });
     }
-};
+}
 
 // Update a talent
 exports.updateTalentProfile = async (req, res) => {
@@ -213,12 +223,12 @@ exports.updateTalentProfile = async (req, res) => {
         let profile_picture = talent.profile_picture;
         if (req.file) {  // ✅ Correct check for single file uploads
             console.log('✅ File was uploaded:', req.file);
-        
+
             if (profile_picture) {
                 console.log('🗑 Deleting old profile picture...');
                 await deleteFromS3(talent.profile_picture);
             }
-        
+
             console.log('📤 Uploading new profile picture to S3...');
             profile_picture = await uploadToS3(req.file, "talentiafilesprod/avatars");
         }
@@ -265,6 +275,33 @@ exports.updateBioTalent = async (req, res) => {
     } catch (error) {
         console.error("Error updating bio:", error);
         return res.status(500).json({ message: "Error updating bio. Please try again." });
+    }
+};
+
+exports.updateTalentSkills = async (req, res) => {
+    const { user_id, skills } = req.body; // `skills` is an array of skill IDs
+
+    if (!Array.isArray(skills)) {
+        return res.status(400).json({ message: "Skills must be an array of skill IDs." });
+    }
+
+    const transaction = await sequelize.transaction();
+
+    try {
+        // Delete all existing user skills
+        await UserSkills.destroy({ where: { user_id }, transaction });
+
+        // Insert new skills
+        const newSkills = skills.map(skill_id => ({ user_id, skill_id }));
+        await UserSkills.bulkCreate(newSkills, { transaction });
+
+        await transaction.commit();
+
+        return res.status(200).json({ message: "Skills updated successfully." });
+    } catch (error) {
+        await transaction.rollback();
+        console.error("Error updating user skills:", error);
+        return res.status(500).json({ message: "Error updating skills. Please try again." });
     }
 };
 
