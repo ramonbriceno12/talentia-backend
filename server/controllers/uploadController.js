@@ -56,31 +56,6 @@ const uploadApplication = async (req, res) => {
     }
 };
 
-
-
-const uploadAvatar = async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
-        }
-
-        const fileUrl = await uploadToS3(req.file, 'avatars');
-        await User.update(
-            { profile_picture: fileUrl },
-            { where: { id: req.body.user_id } }
-        );
-
-        res.status(200).json({ fileUrl });
-    } catch (error) {
-        console.error('Upload error:', error);  // Log full error to console
-        res.status(500).json({
-            message: 'Error uploading avatar',
-            error: error.message || 'Unknown error',
-        });
-    }
-};
-
-
 const uploadResume = async (req, res) => {
     try {
         if (!req.file) {
@@ -322,4 +297,4 @@ const uploadProposal = async (req, res) => {
     }
 };
 
-module.exports = { uploadAvatar, uploadResume, uploadApplication, uploadTalent, uploadCompany, uploadProposal };
+module.exports = { uploadResume, uploadApplication, uploadTalent, uploadCompany, uploadProposal };

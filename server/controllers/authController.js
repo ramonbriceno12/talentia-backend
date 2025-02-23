@@ -33,7 +33,6 @@ exports.register = async (req, res) => {
           role: user.role,
           token: token,
           profile_picture: user.profile_picture,
-          resume_file: user.resume_file,
         },
       });
     }
@@ -92,7 +91,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: 60 * 60 * 24 * 365 } // 1 year in seconds
     );
 
     res.status(200).json({
@@ -129,7 +128,6 @@ exports.getMe = async (req, res) => {
         "full_name",
         "role",
         "profile_picture",
-        "resume_file",
         "bio",
         "country",
         "years_of_experience",

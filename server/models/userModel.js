@@ -3,6 +3,7 @@ require("dotenv").config();
 
 const sequelize = require("../config/database");
 const JobTitle = require("./jobTitles");
+const Resume = require("./resumesModel");
 
 const User = sequelize.define(
   "User",
@@ -12,7 +13,6 @@ const User = sequelize.define(
     full_name: { type: DataTypes.STRING },
     bio: { type: DataTypes.TEXT },
     profile_picture: { type: DataTypes.STRING },
-    resume_file: { type: DataTypes.STRING },
     is_featured: { type: DataTypes.BOOLEAN, defaultValue: false },
     role: {
       type: DataTypes.ENUM("admin", "talent", "company"),
@@ -48,6 +48,11 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: null
+    },
+    headline: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
     }
     
   },
@@ -60,5 +65,11 @@ const User = sequelize.define(
 // ✅ Define the relationship with JobTitle
 User.belongsTo(JobTitle, { foreignKey: "job_title_id", as: "job_title" });
 JobTitle.hasMany(User, { foreignKey: "job_title_id", as: "users" });
+User.hasMany(Resume, {
+  foreignKey: "user_id",
+  as: "resumes",
+  onDelete: "CASCADE",
+});
+Resume.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
 module.exports = User;

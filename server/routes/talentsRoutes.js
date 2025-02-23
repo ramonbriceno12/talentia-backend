@@ -1,10 +1,15 @@
 const express = require('express');
+const { upload } = require('../middleware/upload');
 const { 
     getAllTalents, 
     getTalentById, 
-    createTalent, 
-    updateTalent, 
-    deleteTalent 
+    updateTalentProfile, 
+    deleteTalent,
+    updateBioTalent, 
+    uploadResume,
+    deleteResume,
+    updateExperience,
+    updateTalentSkills,
 } = require('../controllers/talentsController');
 
 const authenticateJWT = require('../middleware/authMiddleware');
@@ -18,10 +23,24 @@ router.get('/', getAllTalents);
 router.get('/:id', getTalentById);
 
 // Create a new talent
-router.post('/', authenticateJWT, createTalent);
 
-// Update a talent by ID
-router.put('/:id', authenticateJWT, updateTalent);
+// Update a talent profile by ID
+router.patch('/profile/:id', authenticateJWT, upload.single('profile_picture'), updateTalentProfile);
+
+//Update a talent bio by ID
+router.patch('/bio/:id', authenticateJWT, updateBioTalent);
+
+//Update a talent experience
+router.patch('/experience/:id', authenticateJWT, updateExperience)
+
+//Update talent skills
+router.patch('/skills/:id', authenticateJWT, updateTalentSkills);
+
+//Add resume to talent
+router.post("/:id/resumes", authenticateJWT, upload.single("resume"), uploadResume);
+
+//Delete resume from talent
+router.delete("/:id/resumes/:resumeId", authenticateJWT, deleteResume);
 
 // Delete a talent by ID
 router.delete('/:id', authenticateJWT, deleteTalent);

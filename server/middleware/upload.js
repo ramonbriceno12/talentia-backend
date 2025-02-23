@@ -1,5 +1,6 @@
 const multer = require('multer');
 const { Upload } = require('@aws-sdk/lib-storage');
+const { DeleteObjectCommand } = require("@aws-sdk/client-s3"); // ✅ Import here
 const s3 = require('../config/s3');
 
 const bucketName = 'talentiafilesprod';
@@ -32,4 +33,23 @@ const uploadToS3 = async (file, folder) => {
     }
 };
 
-module.exports = { upload, uploadToS3 };
+const deleteFromS3 = async (fileUrl, folder = "avatars") => {
+    if (!fileUrl) return;
+
+    // Extract file name from URL
+    const fileName = fileUrl.split("/").pop();
+    const params = {
+        Bucket: bucketName,
+        Key: `${folder}/${fileName}`,
+    };
+
+    try {
+        await s3.send(new DeleteObjectCommand(params));
+        console.log(`✅ Deleted old file from S3: ${fileName}`);
+    } catch (err) {
+        console.error("❌ Error deleting old file from S3:", err);
+        throw new Error("Failed to delete file from S3.");
+    }
+};
+
+module.exports = { upload, uploadToS3, deleteFromS3 };
