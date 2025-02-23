@@ -3,6 +3,8 @@ const JobTitle = require('../models/jobTitles');
 const Skills = require('../models/skillsModel');
 const { Op, Sequelize } = require('sequelize');
 const UserSkills = require("../models/userSkills");
+const Resume = require("../models/resumesModel");
+const { uploadToS3, deleteFromS3 } = require('../middleware/upload');
 
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
@@ -29,15 +31,15 @@ exports.getAllTalents = async (req, res) => {
         const talents = await User.findAll({
             where: whereClause,
             attributes: [
-                "id", "full_name", "email", "bio", "profile_picture", "resume_file",
-                "is_featured", "createdAt", "updatedAt", "country", "years_of_experience", "expected_salary", "job_type_preference",
+                "id", "full_name", "email", "bio", "profile_picture",
+                "is_featured", "createdAt", "updatedAt", "country", "years_of_experience", "expected_salary", "job_type_preference", "headline"
                 [
-                    Sequelize.literal(`(
+                Sequelize.literal(`(
                         SELECT COUNT(*)
                         FROM user_skills
                         WHERE user_skills.user_id = "User".id
                     )`),
-                    "skill_count"
+                "skill_count"
                 ] // Subquery to count skills
             ],
             include: [
@@ -52,6 +54,11 @@ exports.getAllTalents = async (req, res) => {
                     attributes: ["id", "name", "category"],
                     as: "skills",
                     through: { attributes: [] }
+                },
+                {
+                    model: Resume,
+                    attributes: ["id", "resume_url", "created_at"],
+                    as: "resumes",
                 }
             ],
             order: [[Sequelize.literal("skill_count"), "DESC"], ["createdAt", "DESC"]]
@@ -72,13 +79,19 @@ exports.getTalentById = async (req, res) => {
         const talent = await User.findByPk(req.params.id, {
             attributes: [
                 "id", "full_name", "email", "bio", "profile_picture",
-                "resume_file", "is_featured", "createdAt", "years_of_experience", "expected_salary", "job_type_preference"
+                "is_featured", "createdAt", "years_of_experience", 
+                "expected_salary", "job_type_preference", "headline"
             ],
             include: [
                 {
                     model: JobTitle,
                     as: "job_title",
                     attributes: ["title"]
+                },
+                {
+                    model: Resume,  // ✅ Include resumes
+                    as: "resumes",
+                    attributes: ["id", "resume_url", "created_at"]
                 }
             ]
         });
@@ -109,6 +122,49 @@ exports.getTalentById = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error fetching talent" });
+    }
+};
+
+exports.uploadResume = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (!req.file) return res.status(400).json({ message: "No file uploaded." });
+
+        // ✅ Upload to S3
+        const resumeUrl = await uploadToS3(req.file, "talentiafilesprod/resumes");
+
+        // ✅ Save in Database
+        const newResume = await Resume.create({
+            user_id: userId,
+            resume_url: resumeUrl,
+        });
+
+        res.status(201).json(newResume);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error uploading resume." });
+    }
+};
+
+exports.deleteResume = async (req, res) => {
+    try {
+        const { id, resumeId } = req.params;
+
+        // ✅ Find Resume in DB
+        const resume = await Resume.findOne({ where: { id: resumeId, user_id: id } });
+        if (!resume) return res.status(404).json({ message: "Resume not found." });
+
+        // ✅ Delete from S3
+        await deleteFromS3(resume.resume_url);
+
+        // ✅ Remove from Database
+        await Resume.destroy({ where: { id: resumeId } });
+
+        res.json({ message: "Resume deleted successfully!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error deleting resume." });
     }
 };
 
@@ -145,28 +201,70 @@ exports.createTalent = async (req, res) => {
 };
 
 // Update a talent
-exports.updateTalent = async (req, res) => {
-    const { full_name, bio, profile_picture, resume_file, is_featured } = req.body;
-
+exports.updateTalentProfile = async (req, res) => {
     try {
         const talent = await User.findByPk(req.params.id);
-
         if (!talent) {
-            return res.status(404).json({ message: 'Talent not found' });
+            return res.status(404).json({ message: "Talent not found" });
         }
 
+        const { full_name, email, headline, job_title_id } = req.body;
+
+        let profile_picture = talent.profile_picture;
+        if (req.file) {  // ✅ Correct check for single file uploads
+            console.log('✅ File was uploaded:', req.file);
+        
+            if (profile_picture) {
+                console.log('🗑 Deleting old profile picture...');
+                await deleteFromS3(talent.profile_picture);
+            }
+        
+            console.log('📤 Uploading new profile picture to S3...');
+            profile_picture = await uploadToS3(req.file, "talentiafilesprod/avatars");
+        }
+        console.log(profile_picture)
+
+        // ✅ Update Talent Profile
         await talent.update({
             full_name,
-            bio,
+            email,
+            headline,
+            job_title_id,
             profile_picture,
-            resume_file,
-            is_featured
         });
 
-        res.json({ message: 'Talent updated successfully', talent });
+        res.json({ message: "Talent updated successfully", talent });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error updating talent' });
+        console.error(error);
+        res.status(500).json({ message: "Error updating talent" });
+    }
+};
+
+exports.updateBioTalent = async (req, res) => {
+    try {
+        const { bio } = req.body;
+        const { id } = req.params;
+
+        // ✅ Validate input
+        if (!bio || bio.trim().length < 10) {
+            return res.status(400).json({ message: "Bio must be at least 10 characters long." });
+        }
+
+        // ✅ Find the talent by ID
+        const talent = await User.findByPk(id);
+        if (!talent) {
+            return res.status(404).json({ message: "Talent not found." });
+        }
+
+        // ✅ Update bio field only
+        await talent.update({ bio });
+
+        // ✅ Return updated talent
+        return res.status(200).json({ message: "Bio updated successfully.", talent });
+
+    } catch (error) {
+        console.error("Error updating bio:", error);
+        return res.status(500).json({ message: "Error updating bio. Please try again." });
     }
 };
 

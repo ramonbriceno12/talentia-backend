@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { upload } = require('../middleware/upload');
-const { uploadAvatar, uploadResume, uploadApplication, uploadTalent, uploadCompany, uploadProposal } = require('../controllers/uploadController');
-
-// Upload Avatar
-router.post('/avatar', upload.single('avatar'), uploadAvatar);
+const { uploadResume, uploadApplication, uploadTalent, uploadCompany, uploadProposal } = require('../controllers/uploadController');
 
 // Upload Resume
 router.post('/resume', upload.single('resume'), uploadResume);

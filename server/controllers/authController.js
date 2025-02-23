@@ -33,7 +33,6 @@ exports.register = async (req, res) => {
           role: user.role,
           token: token,
           profile_picture: user.profile_picture,
-          resume_file: user.resume_file,
         },
       });
     }
@@ -129,7 +128,6 @@ exports.getMe = async (req, res) => {
         "full_name",
         "role",
         "profile_picture",
-        "resume_file",
         "bio",
         "country",
         "years_of_experience",
