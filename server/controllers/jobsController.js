@@ -1,36 +1,8 @@
-const { Job, Application, Company, JobCategory } = require('../models/jobsModel');
+const { Job, JobCategory } = require('../models/jobsModel');
+const Company = require('../models/companiesModel');
+const UserSkills = require('../models/userSkills');
+const JobSkills = require('../models/jobSkillsModel')
 const { fn, col } = require('sequelize');  // Import Sequelize functions directly
-
-// Get all jobs with application count
-// exports.getAllJobs = async (req, res) => {
-//   try {
-//     const jobs = await Job.findAll({
-//       include: [
-//         {
-//           model: Application,
-//           attributes: [],
-//         },
-//         {
-//           model: Company,
-//           attributes: [],
-//         }
-//       ],
-//       attributes: {
-//         include: [
-//           [fn("COUNT", col("Applications.id")), "application_count"],
-//           [col("Company.name"), "company_name"]
-//         ]
-//       },
-//       group: ['Job.id', 'Company.id'],
-//       raw: true,
-//       nest: true
-//     });
-//     res.json(jobs);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: 'Error fetching jobs' });
-//   }
-// };
 
 exports.getJobCategories = async (req, res) => {
   try {
@@ -98,6 +70,58 @@ exports.getJobById = async (req, res) => {
   //   console.log(error);
   //   res.status(500).json({ message: 'Error fetching job' });
   // }
+};
+
+exports.getTalentRelatedJob = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+
+    // Fetch user's skills
+    const userSkills = await UserSkills.findAll({
+      where: { user_id },
+      attributes: ["skill_id"],
+    });
+
+    if (!userSkills.length) {
+      return res.json({ jobs: [] }); // No skills found, return empty list
+    }
+
+    const skillIds = userSkills.map(us => us.skill_id);
+
+    // ✅ Fix: Use alias "JobSkills" in the include statement
+    const relatedJobs = await Job.findAll({
+      include: [
+        {
+          model: JobSkills,
+          as: "JobSkills", // ✅ Use alias correctly
+          where: { skill_id: skillIds },
+          attributes: [], // Don't return JobSkill data in response
+        },
+        {
+          model: Company,
+          as: 'company',
+          attributes: ["id", "name"],
+        }
+      ],
+      limit: 10, // Get up to 10 related jobs
+      attributes: ["id", "title", "location", "is_remote", "company_id"],
+      distinct: true,
+    });
+
+    // Format response
+    const formattedJobs = relatedJobs.map(job => ({
+      id: job.id,
+      title: job.title,
+      location: job.location,
+      is_remote: job.is_remote,
+      company: job.Company ? job.Company.name : "Unknown Company",
+    }));
+
+    res.json({ jobs: formattedJobs });
+  } catch (error) {
+    console.error("Error fetching related jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 

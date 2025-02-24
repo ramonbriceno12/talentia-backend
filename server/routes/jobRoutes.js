@@ -5,7 +5,8 @@ const {
     createJob, 
     updateJob, 
     deleteJob, 
-    getJobCategories
+    getJobCategories,
+    getTalentRelatedJob,
 } = require('../controllers/jobsController');
 
 const authenticateJWT = require('../middleware/authMiddleware');
@@ -15,7 +16,13 @@ const router = express.Router();
 // Get all jobs
 router.get('/', getAllJobs);
 
+// Get Job Categories
+
 router.get('/categories/', getJobCategories);
+
+//Get Talent Related Jobs
+
+router.get('/talent/related/:id', authenticateJWT, getTalentRelatedJob)
 
 // Get job by ID
 router.get('/:id', getJobById);
