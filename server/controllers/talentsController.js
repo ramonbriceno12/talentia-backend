@@ -133,63 +133,78 @@ exports.getTalentById = async (req, res) => {
     }
 };
 
-exports.getTalentProfileCompletion = async (req, res) => {
+exports.getProfileCompletion = async (req, res) => {
     try {
-        const talentId = req.params.id;
+        const { id } = req.params;
 
-        // Fetch the talent data
-        const talent = await User.findByPk(talentId, {
+        // ✅ Fetch user with correct associations
+        const user = await User.findByPk(id, {
             attributes: [
                 "full_name", "email", "bio", "profile_picture",
                 "years_of_experience", "expected_salary", "job_type_preference",
-                "headline"
+                "headline", "job_title_id"
             ],
             include: [
-                {
-                    model: JobTitle,
-                    as: "job_title",
-                    attributes: ["title"]
-                },
-                {
-                    model: Resume,
-                    as: "resumes",
-                    attributes: ["id"]
-                }
+                { model: Resume, as: "resumes", attributes: ["id"] },
+                { model: Skills, as: "skills", attributes: ["id"] }, // ✅ Corrected: Fetch skills instead of UserSkills
+                { model: UserLinks, as: "links", attributes: ["id"] } // ✅ Corrected: Fetch user links with correct alias
             ]
         });
 
-        if (!talent) return res.status(404).json({ message: "Talent not found" });
+        if (!user) return res.status(404).json({ message: "Talent not found" });
 
-        // Fetch skills and links
-        const userSkills = await UserSkills.count({ where: { user_id: talentId } });
-        const userLinks = await UserLinks.count({ where: { user_id: talentId } });
-
-        // Define total fields to consider for profile completion
-        const totalFields = 9; // Total fields considered for profile completion
+        let completion = 0;
+        const totalFields = 9;
         let filledFields = 0;
+        let missingFields = [];
 
-        // Check filled fields
-        if (talent.full_name) filledFields++;
-        if (talent.email) filledFields++;
-        if (talent.bio) filledFields++;
-        if (talent.profile_picture) filledFields++;
-        if (talent.years_of_experience) filledFields++;
-        if (talent.expected_salary && parseFloat(talent.expected_salary) > 0) filledFields++;
-        if (talent.job_type_preference) filledFields++;
-        if (talent.headline) filledFields++;
-        if (talent.job_title) filledFields++;
+        // ✅ Required fields and their labels
+        const requiredFields = {
+            full_name: "Nombre Completo",
+            email: "Correo Electrónico",
+            bio: "Biografía",
+            profile_picture: "Foto de Perfil",
+            job_title_id: "Cargo",
+            headline: "Titular Profesional",
+            years_of_experience: "Años de Experiencia",
+            expected_salary: "Salario Esperado",
+            job_type_preference: "Preferencia de Trabajo",
+        };
 
-        // Check associated records
-        if (userSkills > 0) filledFields++;
-        if (userLinks > 0) filledFields++;
-        if (talent.resumes.length > 0) filledFields++;
+        // ✅ Check each required field
+        for (const [key, label] of Object.entries(requiredFields)) {
+            if (user[key]) {
+                filledFields++;
+            } else {
+                missingFields.push(label);
+            }
+        }
 
-        // Calculate profile completion percentage
-        const completionPercentage = Math.round((filledFields / (totalFields + 3)) * 100); // +3 for skills, links, resumes
+        // ✅ Additional sections (resumes, skills, links)
+        if (user.resumes.length > 0) {
+            filledFields++;
+        } else {
+            missingFields.push("Currículum");
+        }
 
-        res.json({ completionPercentage });
+        if (user.skills.length > 0) { // ✅ Fetch skills correctly
+            filledFields++;
+        } else {
+            missingFields.push("Habilidades");
+        }
+
+        if (user.links.length > 0) { // ✅ Fetch links correctly
+            filledFields++;
+        } else {
+            missingFields.push("Enlaces Profesionales (LinkedIn, GitHub, etc.)");
+        }
+
+        // ✅ Calculate completion percentage
+        completion = Math.round((filledFields / (totalFields + 3)) * 100);
+
+        res.status(200).json({ completionPercentage: completion, missingFields });
     } catch (error) {
-        console.error("Error calculating profile completion:", error);
+        console.error("Error fetching profile completion:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
