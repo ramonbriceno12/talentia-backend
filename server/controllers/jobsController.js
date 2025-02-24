@@ -3,6 +3,7 @@ const Company = require('../models/companiesModel');
 const UserSkills = require('../models/userSkills');
 const JobSkills = require('../models/jobSkillsModel')
 const { fn, col } = require('sequelize');  // Import Sequelize functions directly
+const Skills = require('../models/skillsModel');
 
 exports.getJobCategories = async (req, res) => {
   try {
@@ -14,34 +15,77 @@ exports.getJobCategories = async (req, res) => {
   }
 };
 
-exports.getAllJobs = async (req, res) => {
+exports.getAllJobsAdmin = async (req, res) => {
   try {
-    const jobs = await Job.findAll({
-      include: [
-        {
-          model: Company,
-          attributes: [],
-        },
-        {
-          model: JobCategory,
-          attributes: [],
-        }
-      ],
-      attributes: {
-        include: [
-          [col("Company.name"), "company_name"],
-          [col("JobCategory.name"), "category_name"]
-        ]
-      }
-      ,
-      group: ['Job.id', 'Company.id', 'JobCategory.id'],
-      raw: true,
-      nest: true
-    });
-    res.json(jobs);
+      // Fetch all jobs with company details
+      const jobs = await Job.findAll({
+          include: [
+              {
+                  model: Company,
+                  as: "company",
+                  attributes: ["name"],
+              },
+          ],
+          attributes: ["id", "title", "location", "is_remote", "createdAt"],
+          order: [["createdAt", "DESC"]], // Most recent jobs first
+      });
+
+      // Format response
+      const formattedJobs = jobs.map((job) => ({
+          id: job.id,
+          title: job.title,
+          company: job.company?.name || "Unknown Company",
+          location: job.is_remote ? "Remoto" : job.location || "No location",
+          created_at: job.createdAt,
+      }));
+
+      res.json({ jobs: formattedJobs });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching jobs' });
+      console.error("Error fetching jobs:", error);
+      res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getJobByIdAdmin = async (req, res) => {
+  try {
+      const id = req.params.id;
+
+      const job = await Job.findOne({
+          where: { id },
+          include: [
+              {
+                  model: Company,
+                  as: "company",
+                  attributes: ["name"],
+              },
+              {
+                  model: JobSkills,
+                  as: "JobSkills",
+                  include: [
+                    { model: Skills, 
+                      as: 'skills',
+                      attributes: ["name"] 
+
+                    }],
+              },
+          ],
+      });
+
+      if (!job) return res.status(404).json({ message: "Job not found" });
+
+      res.json({
+          id: job.id,
+          title: job.title,
+          company: job.company?.name || "Unknown Company",
+          location: job.is_remote ? "Remoto" : job.location,
+          is_remote: job.is_remote,
+          description: job.description,
+          skills: job.JobSkills.map((js) => js.skills.name),
+          created_at: job.createdAt,
+      });
+  } catch (error) {
+      console.error("Error fetching job details:", error);
+      res.status(500).json({ message: "Server error" });
   }
 };
 

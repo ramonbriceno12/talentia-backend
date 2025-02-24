@@ -26,6 +26,6 @@ const JobSkills = sequelize.define(
 );
 
 // ✅ Do NOT import Job here (fix circular dependency)
-JobSkills.belongsTo(Skill, { foreignKey: "skill_id", as: "Skill" });
+JobSkills.belongsTo(Skill, { foreignKey: "skill_id", as: "skills" });
 
 module.exports = JobSkills;
