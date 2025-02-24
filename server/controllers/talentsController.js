@@ -6,6 +6,7 @@ const sequelize = require('../config/database');
 const UserSkills = require("../models/userSkills");
 const Resume = require("../models/resumesModel");
 const { uploadToS3, deleteFromS3 } = require('../middleware/upload');
+const UserLinks = require('../models/userLinksModel');
 
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
@@ -113,10 +114,17 @@ exports.getTalentById = async (req, res) => {
             attributes: ["id", "name", "category"]
         });
 
-        // Attach skills to talent object
+        // 🔹 Fetch user links
+        const userLinks = await UserLinks.findAll({
+            where: { user_id: talent.id },
+            attributes: ["link_type", "url"]
+        });
+
+        // Attach links & skills to talent object
         res.json({
             ...talent.toJSON(),
-            skills // Append skills manually
+            skills,
+            links: userLinks // Append links manually
         });
 
     } catch (error) {
@@ -167,7 +175,6 @@ exports.deleteResume = async (req, res) => {
         res.status(500).json({ message: "Error deleting resume." });
     }
 };
-
 exports.updateExperience = async (req, res) => {
     try {
         const { years_of_experience, expected_salary, job_type_preference } = req.body;
@@ -191,7 +198,7 @@ exports.updateExperience = async (req, res) => {
         }
 
         // ✅ Find the talent by ID
-        
+
 
         // ✅ Update the fields if provided
         const updatedFields = {};
@@ -209,6 +216,87 @@ exports.updateExperience = async (req, res) => {
         return res.status(500).json({ message: "Error updating experience & salary. Please try again." });
     }
 }
+exports.updateTalentLinks = async (req, res) => {
+    try {
+        const { id } = req.params;
+        let linksArray;
+
+        // Check if the user exists
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: "Talent not found." });
+        }
+
+        // Validate input
+        if (!req.body.links) {
+            return res.status(400).json({ message: "No links provided." });
+        }
+
+        // Ensure proper JSON format
+        try {
+            linksArray = typeof req.body.links === "string" ? JSON.parse(req.body.links) : req.body.links;
+            if (!Array.isArray(linksArray)) {
+                return res.status(400).json({ message: "Invalid format. Expected an array." });
+            }
+        } catch (error) {
+            return res.status(400).json({ message: "Invalid JSON format for links.", error });
+        }
+
+        // Validate links structure (must have `link_type` and `url`)
+        const validLinks = linksArray.filter(link => link.link_type && link.url);
+
+        if (validLinks.length === 0) {
+            return res.status(400).json({ message: "No valid links provided." });
+        }
+
+        // Fetch current links for the user
+        const existingLinks = await UserLinks.findAll({ where: { user_id: id } });
+
+        // ✅ Delete existing links before inserting new ones
+        await UserLinks.destroy({ where: { user_id: id } });
+
+        // ✅ Insert new links
+        await UserLinks.bulkCreate(validLinks.map(link => ({
+            user_id: id,
+            link_type: link.link_type,
+            url: link.url,
+        })));
+
+        return res.status(200).json({ message: "Links updated successfully", links: validLinks });
+
+    } catch (error) {
+        console.error("Error updating links:", error);
+        return res.status(500).json({ message: "Error updating links. Please try again." });
+    }
+};
+
+// exports.deleteTalentLink = async (req, res) => {
+//     try {
+//         const { id, linkId } = req.params;
+
+//         // Check if the user exists
+//         const user = await User.findByPk(id);
+//         if (!user) {
+//             return res.status(404).json({ message: "Talent not found." });
+//         }
+
+//         // Find the link
+//         const link = await UserLinks.findOne({ where: { id: linkId, user_id: id } });
+
+//         if (!link) {
+//             return res.status(404).json({ message: "Link not found." });
+//         }
+
+//         // Delete the link
+//         await link.destroy();
+
+//         return res.status(200).json({ message: "Link deleted successfully." });
+
+//     } catch (error) {
+//         console.error("Error deleting link:", error);
+//         return res.status(500).json({ message: "Error deleting link. Please try again." });
+//     }
+// };
 
 // Update a talent
 exports.updateTalentProfile = async (req, res) => {
@@ -304,6 +392,77 @@ exports.updateTalentSkills = async (req, res) => {
         return res.status(500).json({ message: "Error updating skills. Please try again." });
     }
 };
+
+exports.updateTalentLinks = async (req, res) => {
+    try {
+        const { id } = req.params;
+        let linksArray;
+
+        // Validate input
+        if (!req.body.links) {
+            return res.status(400).json({ message: "No links provided." });
+        }
+
+        // Ensure proper JSON format
+        try {
+            linksArray = typeof req.body.links === "string" ? JSON.parse(req.body.links) : req.body.links;
+            if (!Array.isArray(linksArray)) {
+                return res.status(400).json({ message: "Invalid format. Expected an array." });
+            }
+        } catch (error) {
+            return res.status(400).json({ message: "Invalid JSON format for links.", error });
+        }
+
+        // Validate links structure (must have `link_type` and `url`)
+        const validLinks = linksArray.filter(link => link.link_type && link.url);
+
+        if (validLinks.length === 0) {
+            return res.status(400).json({ message: "No valid links provided." });
+        }
+
+        // Fetch current links for the user
+        const existingLinks = await UserLinks.findAll({ where: { user_id: id } });
+
+        // ✅ Delete existing links before inserting new ones
+        await UserLinks.destroy({ where: { user_id: id } });
+
+        // ✅ Insert new links
+        await UserLinks.bulkCreate(validLinks.map(link => ({
+            user_id: id,
+            link_type: link.link_type,
+            url: link.url,
+        })));
+
+        return res.status(200).json({ message: "Links updated successfully", links: validLinks });
+
+    } catch (error) {
+        console.error("Error updating links:", error);
+        return res.status(500).json({ message: "Error updating links. Please try again." });
+    }
+};
+
+exports.deleteTalentLink = async (req, res) => {
+    try {
+        const { id, linkId } = req.params;
+
+        // Find the link
+        const link = await UserLinks.findOne({ where: { id: linkId, user_id: id } });
+
+        if (!link) {
+            return res.status(404).json({ message: "Link not found." });
+        }
+
+        // Delete the link
+        await link.destroy();
+
+        return res.status(200).json({ message: "Link deleted successfully." });
+
+    } catch (error) {
+        console.error("Error deleting link:", error);
+        return res.status(500).json({ message: "Error deleting link. Please try again." });
+    }
+};
+
 
 // Delete a talent
 exports.deleteTalent = async (req, res) => {

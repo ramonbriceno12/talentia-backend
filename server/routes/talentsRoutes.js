@@ -10,6 +10,8 @@ const {
     deleteResume,
     updateExperience,
     updateTalentSkills,
+    updateTalentLinks,
+    deleteTalentLink,
 } = require('../controllers/talentsController');
 
 const authenticateJWT = require('../middleware/authMiddleware');
@@ -35,6 +37,11 @@ router.patch('/experience/:id', authenticateJWT, updateExperience)
 
 //Update talent skills
 router.patch('/skills/:id', authenticateJWT, updateTalentSkills);
+
+//Update talent links
+router.patch('/links/:id', authenticateJWT, updateTalentLinks)
+
+//Delete talent link
 
 //Add resume to talent
 router.post("/:id/resumes", authenticateJWT, upload.single("resume"), uploadResume);
