@@ -114,7 +114,7 @@ exports.getTalentRelatedJob = async (req, res) => {
       title: job.title,
       location: job.location,
       is_remote: job.is_remote,
-      company: job.Company ? job.Company.name : "Unknown Company",
+      company: job.company ? job.company.name : "Unknown Company",
     }));
 
     res.json({ jobs: formattedJobs });

@@ -77,7 +77,7 @@ exports.getTalentApplicationsDashboard = async (req, res) => {
         const formattedApplications = latestApplications.map((app) => ({
             job_id: app.job?.id || null,
             job_title: app.job?.title || "Unknown Job",
-            company: app.job?.Company?.name || "Unknown Company",
+            company: app.job?.company?.name || "Unknown Company",
             location: app.job?.is_remote ? "Remoto" : app.job?.location || "No location",
             applied_at: app.applied_at,
         }));
