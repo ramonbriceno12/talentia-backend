@@ -133,6 +133,68 @@ exports.getTalentById = async (req, res) => {
     }
 };
 
+exports.getTalentProfileCompletion = async (req, res) => {
+    try {
+        const talentId = req.params.id;
+
+        // Fetch the talent data
+        const talent = await User.findByPk(talentId, {
+            attributes: [
+                "full_name", "email", "bio", "profile_picture",
+                "years_of_experience", "expected_salary", "job_type_preference",
+                "headline"
+            ],
+            include: [
+                {
+                    model: JobTitle,
+                    as: "job_title",
+                    attributes: ["title"]
+                },
+                {
+                    model: Resume,
+                    as: "resumes",
+                    attributes: ["id"]
+                }
+            ]
+        });
+
+        if (!talent) return res.status(404).json({ message: "Talent not found" });
+
+        // Fetch skills and links
+        const userSkills = await UserSkills.count({ where: { user_id: talentId } });
+        const userLinks = await UserLinks.count({ where: { user_id: talentId } });
+
+        // Define total fields to consider for profile completion
+        const totalFields = 9; // Total fields considered for profile completion
+        let filledFields = 0;
+
+        // Check filled fields
+        if (talent.full_name) filledFields++;
+        if (talent.email) filledFields++;
+        if (talent.bio) filledFields++;
+        if (talent.profile_picture) filledFields++;
+        if (talent.years_of_experience) filledFields++;
+        if (talent.expected_salary && parseFloat(talent.expected_salary) > 0) filledFields++;
+        if (talent.job_type_preference) filledFields++;
+        if (talent.headline) filledFields++;
+        if (talent.job_title) filledFields++;
+
+        // Check associated records
+        if (userSkills > 0) filledFields++;
+        if (userLinks > 0) filledFields++;
+        if (talent.resumes.length > 0) filledFields++;
+
+        // Calculate profile completion percentage
+        const completionPercentage = Math.round((filledFields / (totalFields + 3)) * 100); // +3 for skills, links, resumes
+
+        res.json({ completionPercentage });
+    } catch (error) {
+        console.error("Error calculating profile completion:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
 exports.uploadResume = async (req, res) => {
     try {
         const userId = req.params.id;
