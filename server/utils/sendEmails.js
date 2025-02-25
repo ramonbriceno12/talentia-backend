@@ -7,6 +7,9 @@ const adminEmailTemplate = require("./templates/proposals/adminEmailTemplate");
 const talentProposalEmailTemplate = require("./templates/proposals/talentEmailTemplate");
 const resumeImprovementEmailTemplate = require("./templates/bulk-emails/optimizeProfileEmail");
 const talentVisibilityEmailTemplate = require("./templates/bulk-emails/publishedTalentEmail");
+const talentAppliedEmailTemplate = require("./templates/applications/talentApplicationsEmail");
+const companyApplicationEmailTemplate = require("./templates/applications/companyApplicationEmail");
+const adminApplicationEmailTemplate = require("./templates/applications/adminApplicationEmail");
 require("dotenv").config();
 
 const sendTalentEmail = async (to, subject, name) => {
@@ -201,13 +204,88 @@ const sendPublishedTalentEmailBulk = async (to, subject, name) => {
   }
 }
 
-module.exports = { 
-  sendTalentEmail, 
-  sendCompanyEmail, 
-  sendSubscriptionEmail, 
-  sendProposalUserEmail, 
-  sendProposalAdminEmail, 
-  sendTalentProposalEmail, 
+const sendTalentAppliedEmail = async (to, talentName, jobTitle, companyName) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail", // or use 'SMTP' for custom email providers
+      auth: {
+        user: process.env.EMAIL_USERNAME, // Your email
+        pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+      },
+    });
+
+    const mailOptions = {
+      from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
+      to,
+      subject: `¡Has aplicado exitosamente en Talentia, ${talentName} !`,
+      html: talentAppliedEmailTemplate(talentName, jobTitle, companyName),
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully to", to);
+  } catch (error) {
+    console.error("❌ Error sending email:", error);
+  }
+}
+
+const sendCompanyApplicationEmail = async (to, companyName, jobTitle, talentName, talentEmail) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail", // or use 'SMTP' for custom email providers
+      auth: {
+        user: process.env.EMAIL_USERNAME, // Your email
+        pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+      },
+    });
+
+    const mailOptions = {
+      from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
+      to,
+      subject: `📨 ¡Nueva Aplicación Recibida en Talentia!`,
+      html: companyApplicationEmailTemplate(companyName, jobTitle, talentName, talentEmail),
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully to", to);
+  } catch (error) {
+    console.error("❌ Error sending email:", error);
+  }
+}
+
+const sendAdminApplicationEmail = async (talentName, jobTitle, companyName) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail", // or use 'SMTP' for custom email providers
+      auth: {
+        user: process.env.EMAIL_USERNAME, // Your email
+        pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+      },
+    });
+
+    const mailOptions = {
+      from: `"Talentia" <${process.env.EMAIL_USERNAME}>`,
+      to: ['contacto@talentiave.com'],
+      subject: `📨 ¡Nueva Aplicación Recibida en Talentia!`,
+      html: adminApplicationEmailTemplate(talentName, jobTitle, companyName),
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully to", 'contacto@talentiave.com');
+  } catch (error) {
+    console.error("❌ Error sending email:", error);
+  }
+}
+
+module.exports = {
+  sendTalentEmail,
+  sendCompanyEmail,
+  sendSubscriptionEmail,
+  sendProposalUserEmail,
+  sendProposalAdminEmail,
+  sendTalentProposalEmail,
   sendImproveProfileEmail,
-  sendPublishedTalentEmailBulk  
+  sendPublishedTalentEmailBulk,
+  sendTalentAppliedEmail,
+  sendCompanyApplicationEmail,
+  sendAdminApplicationEmail,
 };

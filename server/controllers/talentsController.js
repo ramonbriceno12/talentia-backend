@@ -133,6 +133,83 @@ exports.getTalentById = async (req, res) => {
     }
 };
 
+exports.getProfileCompletion = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // ✅ Fetch user with correct associations
+        const user = await User.findByPk(id, {
+            attributes: [
+                "full_name", "email", "bio", "profile_picture",
+                "years_of_experience", "expected_salary", "job_type_preference",
+                "headline", "job_title_id"
+            ],
+            include: [
+                { model: Resume, as: "resumes", attributes: ["id"] },
+                { model: Skills, as: "skills", attributes: ["id"] }, // ✅ Corrected: Fetch skills instead of UserSkills
+                { model: UserLinks, as: "links", attributes: ["id"] } // ✅ Corrected: Fetch user links with correct alias
+            ]
+        });
+
+        if (!user) return res.status(404).json({ message: "Talent not found" });
+
+        let completion = 0;
+        const totalFields = 9;
+        let filledFields = 0;
+        let missingFields = [];
+
+        // ✅ Required fields and their labels
+        const requiredFields = {
+            full_name: "Nombre Completo",
+            email: "Correo Electrónico",
+            bio: "Biografía",
+            profile_picture: "Foto de Perfil",
+            job_title_id: "Cargo",
+            headline: "Titular Profesional",
+            years_of_experience: "Años de Experiencia",
+            expected_salary: "Salario Esperado",
+            job_type_preference: "Preferencia de Trabajo",
+        };
+
+        // ✅ Check each required field
+        for (const [key, label] of Object.entries(requiredFields)) {
+            if (user[key]) {
+                filledFields++;
+            } else {
+                missingFields.push(label);
+            }
+        }
+
+        // ✅ Additional sections (resumes, skills, links)
+        if (user.resumes.length > 0) {
+            filledFields++;
+        } else {
+            missingFields.push("Currículum");
+        }
+
+        if (user.skills.length > 0) { // ✅ Fetch skills correctly
+            filledFields++;
+        } else {
+            missingFields.push("Habilidades");
+        }
+
+        if (user.links.length > 0) { // ✅ Fetch links correctly
+            filledFields++;
+        } else {
+            missingFields.push("Enlaces Profesionales (LinkedIn, GitHub, etc.)");
+        }
+
+        // ✅ Calculate completion percentage
+        completion = Math.round((filledFields / (totalFields + 3)) * 100);
+
+        res.status(200).json({ completionPercentage: completion, missingFields });
+    } catch (error) {
+        console.error("Error fetching profile completion:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
 exports.uploadResume = async (req, res) => {
     try {
         const userId = req.params.id;

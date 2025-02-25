@@ -1,6 +1,7 @@
 const User = require("./userModel");
 const Skills = require("./skillsModel");
 const UserSkills = require("./userSkills");
+const UserLinks = require("./userLinksModel");
 
 // ✅ Define many-to-many relationship in a separate file
 User.belongsToMany(Skills, {
@@ -17,4 +18,14 @@ Skills.belongsToMany(User, {
   as: "users",
 });
 
-module.exports = { User, Skills, UserSkills };
+User.hasMany(UserLinks, {
+  foreignKey: "user_id",
+  as: "links", // ✅ This alias must match the include in queries
+});
+
+UserLinks.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+module.exports = { User, Skills, UserSkills, UserLinks };

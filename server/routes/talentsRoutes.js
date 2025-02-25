@@ -12,6 +12,7 @@ const {
     updateTalentSkills,
     updateTalentLinks,
     deleteTalentLink,
+    getProfileCompletion,
 } = require('../controllers/talentsController');
 
 const authenticateJWT = require('../middleware/authMiddleware');
@@ -24,7 +25,9 @@ router.get('/', getAllTalents);
 // Get talent by ID
 router.get('/:id', getTalentById);
 
-// Create a new talent
+// Get Talent profile completion
+
+router.get('/completion/:id', authenticateJWT, getProfileCompletion)
 
 // Update a talent profile by ID
 router.patch('/profile/:id', authenticateJWT, upload.single('profile_picture'), updateTalentProfile);

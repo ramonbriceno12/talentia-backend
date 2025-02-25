@@ -1,36 +1,10 @@
-const { Job, Application, Company, JobCategory } = require('../models/jobsModel');
+const { Job, JobCategory } = require('../models/jobsModel');
+const Company = require('../models/companiesModel');
+const UserSkills = require('../models/userSkills');
+const JobSkills = require('../models/jobSkillsModel')
 const { fn, col } = require('sequelize');  // Import Sequelize functions directly
-
-// Get all jobs with application count
-// exports.getAllJobs = async (req, res) => {
-//   try {
-//     const jobs = await Job.findAll({
-//       include: [
-//         {
-//           model: Application,
-//           attributes: [],
-//         },
-//         {
-//           model: Company,
-//           attributes: [],
-//         }
-//       ],
-//       attributes: {
-//         include: [
-//           [fn("COUNT", col("Applications.id")), "application_count"],
-//           [col("Company.name"), "company_name"]
-//         ]
-//       },
-//       group: ['Job.id', 'Company.id'],
-//       raw: true,
-//       nest: true
-//     });
-//     res.json(jobs);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: 'Error fetching jobs' });
-//   }
-// };
+const Skills = require('../models/skillsModel');
+const Application = require('../models/applicationsModel');
 
 exports.getJobCategories = async (req, res) => {
   try {
@@ -42,34 +16,78 @@ exports.getJobCategories = async (req, res) => {
   }
 };
 
-exports.getAllJobs = async (req, res) => {
+exports.getAllJobsAdmin = async (req, res) => {
   try {
+    // Fetch all jobs with company details
     const jobs = await Job.findAll({
       include: [
         {
           model: Company,
-          attributes: [],
+          as: "company",
+          attributes: ["name"],
+        },
+      ],
+      attributes: ["id", "title", "location", "is_remote", "createdAt"],
+      order: [["createdAt", "DESC"]], // Most recent jobs first
+    });
+
+    // Format response
+    const formattedJobs = jobs.map((job) => ({
+      id: job.id,
+      title: job.title,
+      company: job.company?.name || "Unknown Company",
+      location: job.is_remote ? "Remoto" : job.location || "No location",
+      created_at: job.createdAt,
+    }));
+
+    res.json({ jobs: formattedJobs });
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getJobByIdAdmin = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const job = await Job.findOne({
+      where: { id },
+      include: [
+        {
+          model: Company,
+          as: "company",
+          attributes: ["name"],
         },
         {
-          model: JobCategory,
-          attributes: [],
-        }
+          model: JobSkills,
+          as: "JobSkills",
+          include: [
+            {
+              model: Skills,
+              as: 'skills',
+              attributes: ["name"]
+
+            }],
+        },
       ],
-      attributes: {
-        include: [
-          [col("Company.name"), "company_name"],
-          [col("JobCategory.name"), "category_name"]
-        ]
-      }
-      ,
-      group: ['Job.id', 'Company.id', 'JobCategory.id'],
-      raw: true,
-      nest: true
     });
-    res.json(jobs);
+
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    res.json({
+      id: job.id,
+      title: job.title,
+      company: job.company?.name || "Unknown Company",
+      location: job.is_remote ? "Remoto" : job.location,
+      is_remote: job.is_remote,
+      description: job.description,
+      skills: job.JobSkills.map((js) => js.skills.name),
+      created_at: job.createdAt,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching jobs' });
+    console.error("Error fetching job details:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -98,6 +116,69 @@ exports.getJobById = async (req, res) => {
   //   console.log(error);
   //   res.status(500).json({ message: 'Error fetching job' });
   // }
+};
+
+exports.getTalentRelatedJob = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+
+    // Fetch user's skills
+    const userSkills = await UserSkills.findAll({
+      where: { user_id },
+      attributes: ["skill_id"],
+    });
+
+    if (!userSkills.length) {
+      return res.json({ jobs: [] }); // No skills found, return empty list
+    }
+
+    const skillIds = userSkills.map(us => us.skill_id);
+
+    // Fetch related jobs
+    const relatedJobs = await Job.findAll({
+      include: [
+        {
+          model: JobSkills,
+          as: "JobSkills", // Use alias correctly
+          where: { skill_id: skillIds },
+          attributes: [], // Don't return JobSkill data in response
+        },
+        {
+          model: Company,
+          as: 'company',
+          attributes: ["id", "name"],
+        }
+      ],
+      limit: 10, // Get up to 10 related jobs
+      attributes: ["id", "title", "location", "is_remote", "company_id", "createdAt"],
+      distinct: true,
+    });
+
+    // Check if the talent has applied to each job
+    const formattedJobs = await Promise.all(relatedJobs.map(async (job) => {
+      const hasApplied = await Application.findOne({
+        where: {
+          job_id: job.id,
+          applicant_id: user_id,
+        },
+      });
+
+      return {
+        id: job.id,
+        title: job.title,
+        location: job.location,
+        is_remote: job.is_remote,
+        company: job.company ? job.company.name : "Unknown Company",
+        created_at: job.createdAt,
+        hasApplied: !!hasApplied, // Add hasApplied flag
+      };
+    }));
+
+    res.json({ jobs: formattedJobs });
+  } catch (error) {
+    console.error("Error fetching related jobs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 
