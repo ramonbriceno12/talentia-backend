@@ -148,7 +148,7 @@ exports.getTalentRelatedJob = async (req, res) => {
         }
       ],
       limit: 10, // Get up to 10 related jobs
-      attributes: ["id", "title", "location", "is_remote", "company_id"],
+      attributes: ["id", "title", "location", "is_remote", "company_id", "createdAt"],
       distinct: true,
     });
 
@@ -159,6 +159,7 @@ exports.getTalentRelatedJob = async (req, res) => {
       location: job.location,
       is_remote: job.is_remote,
       company: job.company ? job.company.name : "Unknown Company",
+      created_at: job.createdAt
     }));
 
     res.json({ jobs: formattedJobs });
