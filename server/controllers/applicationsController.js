@@ -1,6 +1,8 @@
 const Application = require("../models/applicationsModel");
 const { Job } = require("../models/jobsModel");
 const Company = require("../models/companiesModel");
+const { sendTalentAppliedEmail, sendCompanyApplicationEmail, sendAdminApplicationEmail } = require("../utils/sendEmails");
+const User = require("../models/userModel");
 
 
 // ✅ Create a new application
@@ -18,6 +20,8 @@ exports.createApplication = async (req, res) => {
         if (!job) {
             return res.status(404).json({ message: "Job not found." });
         }
+
+        const talent = await User.findByPk(applicant_id);
 
         // Check if the user has already applied for this job
         const existingApplication = await Application.findOne({
@@ -43,7 +47,7 @@ exports.createApplication = async (req, res) => {
                 {
                     model: Company,
                     as: "company",
-                    attributes: ["name"],
+                    attributes: ["name", "email"],
                 },
             ],
             attributes: ["id", "title", "location", "is_remote"],
@@ -61,7 +65,19 @@ exports.createApplication = async (req, res) => {
             cover_letter: newApplication.cover_letter,
         };
 
+        // Send response to the frontend immediately
         res.status(201).json({ message: "Application submitted successfully.", application: response });
+
+        // Send emails in the background (without waiting for them to complete)
+        sendTalentAppliedEmail(talent.email, talent.full_name, jobDetails.title, jobDetails.company?.name || "Unknown Company")
+            .catch((error) => console.error("Error sending talent email:", error));
+
+        sendCompanyApplicationEmail(jobDetails.company?.email, jobDetails.company?.name || "Unknown Company", jobDetails.title, talent.full_name, talent.email)
+            .catch((error) => console.error("Error sending company email:", error));
+
+        sendAdminApplicationEmail(talent.full_name, jobDetails.title, jobDetails.company?.name || "Unknown Company")
+            .catch((error) => console.error("Error sending admin email:", error));
+
     } catch (error) {
         console.error("Error creating application:", error);
         res.status(500).json({ message: "Server error" });
