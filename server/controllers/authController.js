@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
       await user.save();
 
       // Generate token
-      const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
+      const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 * 365 });
 
       return res.status(200).json({
         message: "Password set successfully. You can now log in.",
@@ -41,7 +41,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     user = await User.create({ email, password_hash: hashedPassword, full_name: name, role });
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 * 365 });
 
     res.status(201).json({
       message: "User registered successfully",

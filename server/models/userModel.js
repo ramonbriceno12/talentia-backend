@@ -4,6 +4,7 @@ require("dotenv").config();
 const sequelize = require("../config/database");
 const JobTitle = require("./jobTitles");
 const Resume = require("./resumesModel");
+const Plan = require("./planModel");
 
 const User = sequelize.define(
   "User",
@@ -53,8 +54,16 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: null
-    }
-    
+    },
+    plan_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 1,
+      references: {
+        model: "plans",
+        key: "id",
+      },
+    },
   },
   {
     tableName: "users",
@@ -65,6 +74,10 @@ const User = sequelize.define(
 // ✅ Define the relationship with JobTitle
 User.belongsTo(JobTitle, { foreignKey: "job_title_id", as: "job_title" });
 JobTitle.hasMany(User, { foreignKey: "job_title_id", as: "users" });
+
+User.belongsTo(Plan, { foreignKey: "plan_id", as: "plan" });
+Plan.hasMany(User, { foreignKey: "plan_id", as: "users" });
+
 User.hasMany(Resume, {
   foreignKey: "user_id",
   as: "resumes",
