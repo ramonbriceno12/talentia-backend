@@ -2,6 +2,11 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const sequelize = require('./config/database');
+const http = require("http"); // ✅ Import HTTP to attach socket.io
+
+const { setupSocketServer } = require("./config/socketServer"); // ✅ Import the WebSocket setup
+
+//Routes
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const companyRoutes = require('./routes/companiesRoutes')
@@ -17,6 +22,7 @@ const proposalsRoutes = require('./routes/proposalsRoutes')
 const billingRoutes = require('./routes/billingRoutes.js')
 const connectionsRoutes = require('./routes/connectionsRoutes.js');
 const followsRoutes = require('./routes/followsRoutes.js');
+const notificationsRoutes = require('./routes/notificationsRoutes.js');
 require("./models/associations"); // Ensure associations are set up before syncing
 
 
@@ -33,6 +39,9 @@ app.use(cors());
 //   credentials: true
 // }));
 
+const server = http.createServer(app); // ✅ Create HTTP server
+setupSocketServer(server);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/companies/', companyRoutes);
@@ -48,12 +57,13 @@ app.use('/api/proposals', proposalsRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/connections', connectionsRoutes);
 app.use('/api/follows', followsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 const PORT = process.env.PORT || 5000;
 
 sequelize.authenticate()
   .then(() => {
     console.log('Database connected...');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => console.log('Error connecting to the database:', err));

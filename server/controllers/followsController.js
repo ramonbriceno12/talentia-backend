@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Follow = require('../models/followsModel');
+const { createNotification, sendNotification } = require('./notificationsController');
 
 
 exports.getFollowers = async (req, res) => {
@@ -95,6 +96,14 @@ exports.followUser = async (req, res) => {
 
         // Create new follow record
         await Follow.create({ follower_id: followerId, followed_id: followedId });
+
+        // ✅ Send Notification Internally
+        await sendNotification({
+            user_id: followedId, // The user being followed
+            sender_id: followerId, // The one following
+            type: "follow",
+            message: "👤 You have a new follower!",
+        });
 
         return res.json({ message: "Followed successfully!" });
     } catch (error) {
