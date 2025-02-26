@@ -1,11 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const Plan = require('../models/planModel');
 
 exports.register = async (req, res) => {
   const { email, password, name, role } = req.body;
 
   try {
+
     let user = await User.findOne({ where: { email } });
 
     if (user) {
@@ -14,12 +16,16 @@ exports.register = async (req, res) => {
         return res.status(409).json({ message: "User already exists with a password. Please log in." });
       }
 
+
       // If user exists but has no password, update with new password
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password_hash = hashedPassword;
       user.full_name = name || user.full_name; // Update name if provided
       user.role = role || user.role; // Keep existing role if not provided
       await user.save();
+
+
+
 
       // Generate token
       const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 * 365 });
@@ -63,8 +69,8 @@ exports.register = async (req, res) => {
 
 
 exports.login = async (req, res) => {
+
   const { email, password } = req.body;
-  console.log(email, password);
 
   try {
     const user = await User.findOne({ where: { email } });
@@ -143,6 +149,11 @@ exports.getMe = async (req, res) => {
           as: "job_title",
           attributes: ["id", "title"],
         },
+        {
+          model: require("../models/planModel"),
+          as: 'plan',
+          attributes: ["id", "name"]
+        }
       ],
     });
 
