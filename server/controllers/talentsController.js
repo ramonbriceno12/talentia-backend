@@ -7,6 +7,7 @@ const UserSkills = require("../models/userSkills");
 const Resume = require("../models/resumesModel");
 const { uploadToS3, deleteFromS3 } = require('../middleware/upload');
 const UserLinks = require('../models/userLinksModel');
+const Connection = require('../models/connectionsModel');
 
 // Get all talents with optional filtering
 exports.getAllTalents = async (req, res) => {
@@ -347,7 +348,6 @@ exports.updateTalentLinks = async (req, res) => {
     }
 };
 
-// exports.deleteTalentLink = async (req, res) => {
 //     try {
 //         const { id, linkId } = req.params;
 
@@ -539,6 +539,54 @@ exports.deleteTalentLink = async (req, res) => {
         return res.status(500).json({ message: "Error deleting link. Please try again." });
     }
 };
+
+
+exports.getRelatedTalents = async (req, res) => {
+    try {
+        const { id } = req.params; // Logged-in user ID
+
+        // ✅ Fetch the logged-in user's details (job title & skills)
+        const user = await User.findByPk(id, {
+            include: [{ model: JobTitle, as: "job_title" }]
+        });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // ✅ Fetch user's skills
+        const userSkills = await UserSkills.findAll({ where: { user_id: id } });
+        const userSkillIds = userSkills.map(skill => skill.skill_id);
+
+        // ✅ Fetch user's existing connections (to exclude them)
+        const connectedUserIds = await Connection.findAll({
+            where: { user_id: id },
+            attributes: ["connected_user_id"]
+        }).then(connections => connections.map(conn => conn.connected_user_id));
+
+        // ✅ Find related talents
+        const relatedTalents = await User.findAll({
+            where: {
+                id: { [Op.notIn]: [id, ...connectedUserIds] }, // Exclude logged-in user & existing connections
+                [Op.or]: [
+                    { job_title_id: user.job_title_id }, // Match Job Title
+                    { id: { [Op.in]: await UserSkills.findAll({
+                        attributes: ["user_id"],
+                        where: { skill_id: { [Op.in]: userSkillIds } }
+                    }).then(skills => skills.map(s => s.user_id)) } } // Match Skills
+                ]
+            },
+            include: [
+                { model: JobTitle, as: "job_title", attributes: ["title"] }
+            ]
+        });
+
+        return res.status(200).json({ relatedTalents });
+
+    } catch (error) {
+        console.error("Error fetching related talents:", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
 
 
 // Delete a talent

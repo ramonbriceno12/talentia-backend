@@ -1,17 +1,21 @@
 const { DataTypes } = require('sequelize');
-require('dotenv').config();
-
 const sequelize = require('../config/database');
 
 const Connection = sequelize.define('Connection', {
-    user_id: { type: DataTypes.INTEGER },
-    company_id: { type: DataTypes.INTEGER },
-    connected_user_id: { type: DataTypes.INTEGER },
-    connected_company_id: { type: DataTypes.INTEGER },
-    createdAt: { type: DataTypes.DATE, field: 'created_at' }
+    user_id: { type: DataTypes.INTEGER, allowNull: false },
+    connected_user_id: { type: DataTypes.INTEGER, allowNull: false },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            isIn: [['pending', 'accepted', 'declined']], // Simula un ENUM
+        },
+    },
+    createdAt: { type: DataTypes.DATE, field: 'created_at' },
+    updatedAt: { type: DataTypes.DATE, field: 'updated_at' },
 }, {
     tableName: 'connections',
-    timestamps: false
+    timestamps: true,
 });
 
 module.exports = Connection;
