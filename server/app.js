@@ -15,6 +15,8 @@ const profileViewsRoutes = require('./routes/profileViewsRoutes');
 const applicationsRoutes = require('./routes/applicationsRoutes')
 const proposalsRoutes = require('./routes/proposalsRoutes')
 const billingRoutes = require('./routes/billingRoutes.js')
+const connectionsRoutes = require('./routes/connectionsRoutes.js');
+const followsRoutes = require('./routes/followsRoutes.js');
 require("./models/associations"); // Ensure associations are set up before syncing
 
 
@@ -44,6 +46,8 @@ app.use('/api/profile-views', profileViewsRoutes);
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/proposals', proposalsRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/connections', connectionsRoutes);
+app.use('/api/follows', followsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

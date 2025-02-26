@@ -5,6 +5,8 @@ const sequelize = require("../config/database");
 const JobTitle = require("./jobTitles");
 const Resume = require("./resumesModel");
 const Plan = require("./planModel");
+const Connection = require("./connectionsModel");
+const Follow = require("./followsModel");
 
 const User = sequelize.define(
   "User",
@@ -33,15 +35,15 @@ const User = sequelize.define(
     plan_id: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 1 },
     subscribed: { type: DataTypes.BOOLEAN, defaultValue: false },
     email_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
-    email_visibility_sent: {type: DataTypes.BOOLEAN, defaultValue: false},
-    country: {type: DataTypes.STRING, defaultValue: 'N/A'},
+    email_visibility_sent: { type: DataTypes.BOOLEAN, defaultValue: false },
+    country: { type: DataTypes.STRING, defaultValue: 'N/A' },
     years_of_experience: {
       type: DataTypes.INTEGER,
-      allowNull: true, 
+      allowNull: true,
       default: null
     },
     expected_salary: {
-      type: DataTypes.DECIMAL(10, 2), 
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
       defaultValue: 0.00,
     },
@@ -64,6 +66,11 @@ const User = sequelize.define(
         key: "id",
       },
     },
+    status_badge: {
+      type: DataTypes.ENUM("open_to_work", "recruiting"),
+      allowNull: true,
+      defaultValue: null,
+    },
   },
   {
     tableName: "users",
@@ -84,5 +91,21 @@ User.hasMany(Resume, {
   onDelete: "CASCADE",
 });
 Resume.belongsTo(User, { foreignKey: "user_id", as: "user" });
+
+// Relación para conexiones iniciadas por el usuario
+User.hasMany(Connection, { foreignKey: 'user_id', as: 'initiatedConnections' });
+Connection.belongsTo(User, { foreignKey: 'user_id', as: 'initiator' });
+
+// Relación para conexiones recibidas por el usuario
+User.hasMany(Connection, { foreignKey: 'connected_user_id', as: 'receivedConnections' });
+Connection.belongsTo(User, { foreignKey: 'connected_user_id', as: 'connectedUser' });
+
+// Relación para seguimientos iniciados por el usuario
+User.hasMany(Follow, { foreignKey: 'follower_id', as: 'followings' });
+Follow.belongsTo(User, { foreignKey: 'follower_id', as: 'follower' });
+
+// Relación para seguimientos recibidos por el usuario
+User.hasMany(Follow, { foreignKey: 'followed_id', as: 'followers' });
+Follow.belongsTo(User, { foreignKey: 'followed_id', as: 'followed' });
 
 module.exports = User;
