@@ -94,6 +94,7 @@ exports.followUser = async (req, res) => {
             return res.status(400).json({ error: "You are already following this user." });
         }
 
+        const follower = await User.findByPk(followerId, { attributes: ["full_name"] });
         // Create new follow record
         await Follow.create({ follower_id: followerId, followed_id: followedId });
 
@@ -102,7 +103,7 @@ exports.followUser = async (req, res) => {
             user_id: followedId, // The user being followed
             sender_id: followerId, // The one following
             type: "follow",
-            message: "👤 You have a new follower!",
+            message: `👤 <strong>${follower.full_name}</strong> ha empezado a seguirte! <a href="/admin/talents/user/${followerId}" className="text-[#244c56] underline">Ver</a>`,
         });
 
         return res.json({ message: "Followed successfully!" });

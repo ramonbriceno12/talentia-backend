@@ -151,6 +151,25 @@ exports.getConnectionStatuses = async (req, res) => {
 };
 
 
+// ✅ API Route: Count User's Connections
+exports.getConnectionsCount = async (req, res) => {
+    try {
+        const userId = req.user.id; // Get user ID from request parameters
+
+        // Count connections where the user is either `user_id` or `connected_user_id`
+        const totalConnections = await Connection.count({
+            where: {
+                status: "accepted",
+                [Op.or]: [{ user_id: userId }, { connected_user_id: userId }],
+            },
+        });
+
+        res.json({ totalConnections });
+    } catch (error) {
+        console.error("Error fetching connections count:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 
