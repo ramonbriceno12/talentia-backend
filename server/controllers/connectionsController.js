@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const Connection = require('../models/connectionsModel');
 const JobTitle = require('../models/jobTitles');
 const { Op } = require("sequelize");
+const { sendNotification } = require('./notificationsController');
 
 exports.getConnectionsByTalent = async (req, res) => {
 
@@ -69,6 +70,15 @@ exports.sendConnectionRequest = async (req, res) => {
             status: "pending",
         });
 
+        const user = await User.findByPk(userId, { attributes: ["full_name"] });
+
+        await sendNotification({
+            user_id: targetId, // The user being followed
+            sender_id: userId, // The one following
+            type: "connect",
+            message: `👤 <strong>${user.full_name}</strong> ha solicitado conectar! <a href="/admin/talents/user/${userId}" className="text-[#244c56] underline">Ver</a>`,
+        });
+
         res.status(201).json({ message: "Connection request sent", connection: newConnection });
     } catch (error) {
         console.error("Error sending connection request:", error);
@@ -103,15 +113,13 @@ exports.getConnectionStatus = async (req, res) => {
 
 exports.getConnectionStatuses = async (req, res) => {
     try {
-        const userId = parseInt(req.params.userId, 10); 
+        const userId = parseInt(req.params.userId, 10);
         const talentIds = req.body.talentIds.map(id => parseInt(id, 10)); // Convert all to integers
 
         if (!Array.isArray(talentIds) || talentIds.length === 0) {
             return res.status(400).json({ message: "Invalid talent IDs" });
         }
 
-        console.log("🔹 User ID:", userId);
-        console.log("🔹 Talent IDs:", talentIds);
 
         // 🔥 UPDATED QUERY: Ensure both user_id and connected_user_id are explicitly checked
         const connections = await Connection.findAll({
@@ -141,7 +149,6 @@ exports.getConnectionStatuses = async (req, res) => {
             statusMap[talentId] = connection ? connection.status : "none"; // ✅ Ensure status is returned correctly
         });
 
-        console.log("🔹 Final Status Map:", statusMap);
 
         res.json({ connectionStatuses: statusMap });
     } catch (error) {
@@ -151,6 +158,25 @@ exports.getConnectionStatuses = async (req, res) => {
 };
 
 
+// ✅ API Route: Count User's Connections
+exports.getConnectionsCount = async (req, res) => {
+    try {
+        const userId = req.user.id; // Get user ID from request parameters
+
+        // Count connections where the user is either `user_id` or `connected_user_id`
+        const totalConnections = await Connection.count({
+            where: {
+                status: "accepted",
+                [Op.or]: [{ user_id: userId }, { connected_user_id: userId }],
+            },
+        });
+
+        res.json({ totalConnections });
+    } catch (error) {
+        console.error("Error fetching connections count:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 
@@ -168,6 +194,15 @@ exports.acceptConnection = async (req, res) => {
 
         connection.status = "accepted";
         await connection.save();
+
+        const user = await User.findByPk(connection.user_id, { attributes: ["full_name"] });
+
+        await sendNotification({
+            user_id: connection.connected_user_id, // The user being followed
+            sender_id: connection.user_id, // The one following
+            type: "connect",
+            message: `👤 <strong>${user.full_name}</strong> ha solicitado conectar! <a href="/admin/talents/user/${userId}" className="text-[#244c56] underline">Ver</a>`,
+        });
 
         res.status(200).json({ message: "Connection accepted", connection });
     } catch (error) {
@@ -233,7 +268,7 @@ exports.getMutualConnections = async (req, res) => {
         const mutualConnections = await User.findAll({
             where: { id: mutualConnectionIds },
             include: [{
-                model: JobTitle, 
+                model: JobTitle,
                 as: "job_title",
                 attributes: ["title"]
             }],

@@ -387,17 +387,13 @@ exports.updateTalentProfile = async (req, res) => {
 
         let profile_picture = talent.profile_picture;
         if (req.file) {  // ✅ Correct check for single file uploads
-            console.log('✅ File was uploaded:', req.file);
 
             if (profile_picture) {
-                console.log('🗑 Deleting old profile picture...');
                 await deleteFromS3(talent.profile_picture);
             }
 
-            console.log('📤 Uploading new profile picture to S3...');
             profile_picture = await uploadToS3(req.file, "talentiafilesprod/avatars");
         }
-        console.log(profile_picture)
 
         // ✅ Update Talent Profile
         await talent.update({
