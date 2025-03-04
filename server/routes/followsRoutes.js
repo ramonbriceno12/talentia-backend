@@ -5,8 +5,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 router.post("/follow", authMiddleware, followUser); // Follow a user
 router.post("/unfollow", authMiddleware, unfollowUser); // Unfollow a user
-router.get("/following/:userId", getFollowing); // Get users a user follows
-router.get("/followers/:userId", getFollowers); // Get followers of a user
+router.get("/following/:userId", authMiddleware, getFollowing); // Get users a user follows
+router.get("/followers/:userId", authMiddleware, getFollowers); // Get followers of a user
 router.get("/count/:userId", authMiddleware, getFollowersCount);
 router.get("/is-following/:followedId", authMiddleware, isFollowingUser); // Check if following
 router.post("/statuses/:userId", authMiddleware, getFollowStatuses);

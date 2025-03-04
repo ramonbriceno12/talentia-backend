@@ -5,7 +5,6 @@ const { sendSubscriptionEmail, sendImproveProfileEmail, sendPublishedTalentEmail
 const calendlyClickedByUser = async (req, res) => {
     try {
         const email = decodeURIComponent(req.params.email.toLowerCase());
-        console.log('Pasmos por aqui')
 
         const user = await User.findOne({ where: { email } }); // Find user by email
 

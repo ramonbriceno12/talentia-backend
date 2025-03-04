@@ -1,15 +1,30 @@
 const User = require('../models/userModel');
 const Follow = require('../models/followsModel');
 const { createNotification, sendNotification } = require('./notificationsController');
+const JobTitle = require('../models/jobTitles');
 
 
 exports.getFollowers = async (req, res) => {
     try {
-        const { userId } = req.params;
+        console.log(req.user)
+        const userId = req.user.id;
 
         const followers = await Follow.findAll({
             where: { followed_id: userId },
-            include: [{ model: User, as: "follower", attributes: ["id", "full_name", "profile_picture"] }],
+            include: [
+                {
+                    model: User,
+                    as: 'follower', // This is defined in your User model relationships
+                    attributes: ['id', 'full_name', 'profile_picture', 'job_title_id', 'status_badge'],
+                    include: [
+                        {
+                            model: JobTitle,
+                            as: 'job_title', // Including job title details
+                            attributes: ['title']
+                        }
+                    ]
+                }
+            ]
         });
 
         res.json({ followers });
@@ -21,11 +36,21 @@ exports.getFollowers = async (req, res) => {
 
 exports.getFollowing = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user.id;
 
         const following = await Follow.findAll({
             where: { follower_id: userId },
-            include: [{ model: User, as: "followed", attributes: ["id", "full_name", "profile_picture"] }],
+            include: [{ 
+                model: User, 
+                as: "followed", 
+                attributes: ["id", "full_name", "profile_picture", "role", "status_badge"], 
+                include: [
+                {
+                    model: JobTitle,
+                    as: 'job_title', // Including job title details
+                    attributes: ['title']
+                }
+            ] }],
         });
 
         res.json({ following });
@@ -38,7 +63,7 @@ exports.getFollowing = async (req, res) => {
 // Get follow status for multiple users
 exports.getFollowStatuses = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user.id;
         const { talentIds } = req.body; // Expect an array of talent IDs
 
         if (!Array.isArray(talentIds) || talentIds.length === 0) {

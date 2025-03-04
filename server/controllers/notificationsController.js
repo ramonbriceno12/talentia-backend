@@ -4,8 +4,6 @@ const { io, onlineUsers } = require("../config/socketServer");
 // ✅ Internal function (Use this when calling notifications from another function)
 exports.sendNotification = async ({ user_id, sender_id, type, message }) => {
     try {
-        console.log(`📢 Preparing to send notification to user ${user_id}`);
-        console.log("🟡 Active Users before sending notification:", onlineUsers);
 
         const notification = await Notification.create({
             user_id,
@@ -15,11 +13,9 @@ exports.sendNotification = async ({ user_id, sender_id, type, message }) => {
             is_read: false,
         });
 
-        console.log(`✅ Notification saved:`, notification.toJSON());
 
         if (onlineUsers.has(String(user_id))) {
             const receiverSocketId = onlineUsers.get(String(user_id));
-            console.log(`🚀 Sending real-time notification to user ${user_id} (Socket ID: ${receiverSocketId})`);
 
             io().to(receiverSocketId).emit("receiveNotification", {
                 id: notification.id,
